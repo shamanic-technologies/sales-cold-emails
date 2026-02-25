@@ -1,46 +1,39 @@
-import { auth } from "@clerk/nextjs/server";
-
 const API_SERVICE_URL = process.env.API_SERVICE_URL;
+const API_SERVICE_API_KEY = process.env.API_SERVICE_API_KEY;
 
 export function isMockMode(): boolean {
   return !API_SERVICE_URL;
 }
 
-export async function getAuthToken(): Promise<string> {
-  const { getToken } = await auth();
-  const token = await getToken();
-  if (!token) throw new Error("Unauthorized");
-  return token;
+function getHeaders(extra?: Record<string, string>): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...extra,
+  };
+  if (API_SERVICE_API_KEY) {
+    headers["X-API-Key"] = API_SERVICE_API_KEY;
+  }
+  return headers;
 }
 
 export async function proxyToApi(
   path: string,
-  options: {
+  options?: {
     method?: string;
     body?: unknown;
-    token: string;
   }
 ): Promise<Response> {
   const url = `${API_SERVICE_URL}${path}`;
   return fetch(url, {
-    method: options.method ?? "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${options.token}`,
-    },
-    ...(options.body ? { body: JSON.stringify(options.body) } : {}),
+    method: options?.method ?? "GET",
+    headers: getHeaders(),
+    ...(options?.body ? { body: JSON.stringify(options.body) } : {}),
   });
 }
 
-export async function proxySSE(
-  path: string,
-  token: string
-): Promise<Response> {
+export async function proxySSE(path: string): Promise<Response> {
   const url = `${API_SERVICE_URL}${path}`;
   return fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "text/event-stream",
-    },
+    headers: getHeaders({ Accept: "text/event-stream" }),
   });
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMockMode, getAuthToken, proxyToApi } from "@/lib/api-proxy";
+import { isMockMode, proxyToApi } from "@/lib/api-proxy";
 
 export async function GET(
   _req: NextRequest,
@@ -11,8 +11,7 @@ export async function GET(
     return NextResponse.json([]);
   }
 
-  const token = await getAuthToken();
-  const upstream = await proxyToApi(`/v1/campaigns/${id}/emails`, { token });
+  const upstream = await proxyToApi(`/v1/campaigns/${id}/emails`);
   const data = await upstream.json();
   return NextResponse.json(data, { status: upstream.status });
 }

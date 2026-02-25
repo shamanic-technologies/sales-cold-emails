@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { isMockMode, getAuthToken, proxySSE } from "@/lib/api-proxy";
+import { isMockMode, proxySSE } from "@/lib/api-proxy";
 import { MOCK_PROSPECTS, generateMockEmail } from "@/lib/mock-data";
 
 export const dynamic = "force-dynamic";
@@ -103,8 +103,7 @@ export async function GET(
   }
 
   // Real mode: proxy upstream SSE
-  const token = await getAuthToken();
-  const upstream = await proxySSE(`/v1/campaigns/${id}/stream`, token);
+  const upstream = await proxySSE(`/v1/campaigns/${id}/stream`);
 
   if (!upstream.ok || !upstream.body) {
     return new Response(
