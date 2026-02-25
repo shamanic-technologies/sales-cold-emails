@@ -6,6 +6,9 @@ import type {
   WorkflowDag,
   ResultRow,
   DashboardView,
+  GenerateWorkflowResponse,
+  CampaignStats,
+  CampaignAnswers,
 } from "./types";
 
 interface AppState {
@@ -32,6 +35,19 @@ interface AppState {
 
   isApproved: boolean;
   setApproved: (approved: boolean) => void;
+
+  workflowResponse: GenerateWorkflowResponse | null;
+  setWorkflowResponse: (resp: GenerateWorkflowResponse | null) => void;
+
+  campaignId: string | null;
+  setCampaignId: (id: string | null) => void;
+
+  campaignStats: CampaignStats | null;
+  setCampaignStats: (stats: CampaignStats | null) => void;
+
+  campaignAnswers: Partial<CampaignAnswers>;
+  setCampaignAnswer: (key: keyof CampaignAnswers, value: string) => void;
+  clearCampaignAnswers: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -67,11 +83,29 @@ export const useAppStore = create<AppState>()(
 
       isApproved: false,
       setApproved: (approved) => set({ isApproved: approved }),
+
+      workflowResponse: null,
+      setWorkflowResponse: (resp) => set({ workflowResponse: resp }),
+
+      campaignId: null,
+      setCampaignId: (id) => set({ campaignId: id }),
+
+      campaignStats: null,
+      setCampaignStats: (stats) => set({ campaignStats: stats }),
+
+      campaignAnswers: {},
+      setCampaignAnswer: (key, value) =>
+        set((state) => ({
+          campaignAnswers: { ...state.campaignAnswers, [key]: value },
+        })),
+      clearCampaignAnswers: () => set({ campaignAnswers: {} }),
     }),
     {
       name: "sales-cold-emails-store",
       partialize: (state) => ({
         onboardingInput: state.onboardingInput,
+        workflowResponse: state.workflowResponse,
+        campaignId: state.campaignId,
       }),
     }
   )

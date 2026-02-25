@@ -5,15 +5,20 @@ import { Mail, Eye, MessageSquare, Users } from "lucide-react";
 
 export function ProgressStats() {
   const results = useAppStore((s) => s.results);
+  const campaignStats = useAppStore((s) => s.campaignStats);
 
-  const total = results.length;
-  const sent = results.filter((r) =>
-    ["sent", "opened", "replied"].includes(r.status)
-  ).length;
-  const opened = results.filter((r) =>
-    ["opened", "replied"].includes(r.status)
-  ).length;
-  const replied = results.filter((r) => r.status === "replied").length;
+  // Prefer API stats when available, fall back to client-side counting
+  const total = campaignStats?.leadsServed ?? results.length;
+  const sent =
+    campaignStats?.emailsSent ??
+    results.filter((r) => ["sent", "opened", "replied"].includes(r.status))
+      .length;
+  const opened =
+    campaignStats?.emailsOpened ??
+    results.filter((r) => ["opened", "replied"].includes(r.status)).length;
+  const replied =
+    campaignStats?.emailsReplied ??
+    results.filter((r) => r.status === "replied").length;
 
   const stats = [
     {

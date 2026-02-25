@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 
-describe("mock chat flow", () => {
+describe("chat flow", () => {
   it("should generate initial DAG from onboarding input", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/lib/mock-data.ts"),
@@ -15,7 +15,7 @@ describe("mock chat flow", () => {
 
   it('should trigger results on "go" approval', () => {
     const content = fs.readFileSync(
-      path.join(__dirname, "../src/components/chat/use-mock-chat.ts"),
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
       "utf-8"
     );
     expect(content).toContain('"go"');
@@ -25,7 +25,7 @@ describe("mock chat flow", () => {
 
   it("should support workflow modification on user feedback", () => {
     const content = fs.readFileSync(
-      path.join(__dirname, "../src/components/chat/use-mock-chat.ts"),
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
       "utf-8"
     );
     expect(content).toContain("generateModifiedDag");
@@ -33,7 +33,7 @@ describe("mock chat flow", () => {
 
   it("should ask campaign questions conversationally before proposing DAG", () => {
     const content = fs.readFileSync(
-      path.join(__dirname, "../src/components/chat/use-mock-chat.ts"),
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
       "utf-8"
     );
     expect(content).toContain("target_audience");
@@ -44,12 +44,24 @@ describe("mock chat flow", () => {
     expect(content).toContain("social_proof");
   });
 
-  it("should start with brand scraping simulation", () => {
+  it("should call real API endpoints for workflow and campaign", () => {
     const content = fs.readFileSync(
-      path.join(__dirname, "../src/components/chat/use-mock-chat.ts"),
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
       "utf-8"
     );
-    expect(content).toContain("scraping");
-    expect(content).toContain("brandUrl");
+    expect(content).toContain("generateWorkflow");
+    expect(content).toContain("createCampaign");
+    expect(content).toContain("connectCampaignStream");
+  });
+
+  it("should handle SSE events for real-time results", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("onmessage");
+    expect(content).toContain("lead_update");
+    expect(content).toContain("addResult");
+    expect(content).toContain("updateResult");
   });
 });

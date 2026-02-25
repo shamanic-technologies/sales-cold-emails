@@ -62,3 +62,101 @@ export interface ResultRow {
 }
 
 export type DashboardView = "dag" | "results";
+
+// --- API Types ---
+
+export interface GenerateWorkflowRequest {
+  description: string;
+  hints?: {
+    services?: string[];
+    nodeTypes?: string[];
+    expectedInputs?: string[];
+  };
+}
+
+export interface GenerateWorkflowResponse {
+  workflow: {
+    id: string;
+    name: string;
+    category: string;
+    channel: string;
+    audienceType: string;
+    signature: string;
+    signatureName: string;
+    action: "created" | "updated";
+  };
+  dag: ApiDag;
+  generatedDescription: string;
+}
+
+export interface ApiDagNode {
+  id: string;
+  type: string;
+  config?: Record<string, unknown>;
+  inputMapping?: Record<string, string>;
+  retries?: number;
+}
+
+export interface ApiDagEdge {
+  from: string;
+  to: string;
+  condition?: string;
+}
+
+export interface ApiDag {
+  nodes: ApiDagNode[];
+  edges: ApiDagEdge[];
+  onError?: string;
+}
+
+export interface CreateCampaignRequest {
+  name: string;
+  workflowName: string;
+  brandUrl: string;
+  targetAudience: string;
+  targetOutcome: string;
+  valueForTarget: string;
+  urgency: string;
+  scarcity: string;
+  riskReversal: string;
+  socialProof: string;
+  maxBudgetDailyUsd?: number;
+  maxBudgetWeeklyUsd?: number;
+  maxBudgetMonthlyUsd?: number;
+  maxBudgetTotalUsd?: number;
+  maxLeads?: number;
+  endDate?: string;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  workflowName: string;
+  brandUrl: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CampaignStats {
+  campaignId: string;
+  leadsServed: number;
+  leadsBuffered: number;
+  leadsSkipped: number;
+  emailsGenerated: number;
+  emailsSent: number;
+  emailsOpened: number;
+  emailsClicked: number;
+  emailsReplied: number;
+  emailsBounced: number;
+  totalCostUsd: number;
+}
+
+export interface CampaignAnswers {
+  target_audience: string;
+  value_for_target: string;
+  urgency: string;
+  scarcity: string;
+  risk_reversal: string;
+  social_proof: string;
+}
