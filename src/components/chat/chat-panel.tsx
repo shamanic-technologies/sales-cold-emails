@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useAppStore } from "@/lib/store";
 import { useChat } from "./use-chat";
 import { ChatMessages } from "./chat-messages";
@@ -20,9 +21,9 @@ export function ChatPanel() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2 border-b border-gray-200 px-4 py-3">
-        <div className="h-2 w-2 rounded-full bg-emerald-500" />
+        <Image src="/bot-avatar.jpg" alt="Sales Cold Emails" width={28} height={28} className="h-7 w-7 rounded-lg" />
         <span className="text-sm font-medium text-gray-700">
-          Campaign Assistant
+          Sales Cold Emails
         </span>
       </div>
       <ChatMessages messages={messages} onUseSuggestion={handleSend} />

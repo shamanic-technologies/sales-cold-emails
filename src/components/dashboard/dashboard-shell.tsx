@@ -1,7 +1,7 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
-import { Mail } from "lucide-react";
+import Image from "next/image";
 import { ChatPanel } from "@/components/chat/chat-panel";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
@@ -10,9 +10,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-gray-200 px-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-            <Mail className="h-4 w-4" />
-          </div>
+          <Image src="/logo.jpg" alt="Sales Cold Emails" width={32} height={32} className="h-8 w-8 rounded-lg" />
           <span className="font-semibold text-gray-900">
             Sales Cold Emails
           </span>

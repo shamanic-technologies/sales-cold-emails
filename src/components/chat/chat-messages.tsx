@@ -77,8 +77,8 @@ export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
             {/* Suggestion block */}
             {msg.suggestion && (
               <div className="ml-11 mt-2">
-                <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 px-4 py-3">
-                  <p className="mb-2 text-xs font-medium text-indigo-500">
+                <div className="rounded-xl border border-violet-200 bg-violet-50/50 px-4 py-3">
+                  <p className="mb-2 text-xs font-medium text-violet-500">
                     Suggested answer
                   </p>
                   <p className="text-sm text-gray-700">{msg.suggestion}</p>
