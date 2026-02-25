@@ -32,5 +32,15 @@ describe("API client", () => {
     expect(content).toContain("createCampaign");
     expect(content).toContain("getCampaignStats");
     expect(content).toContain("connectCampaignStream");
+    expect(content).toContain("scrapeBrand");
+  });
+
+  it("should call /api/brand/scrape for brand suggestions", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/lib/api-client.ts"),
+      "utf-8"
+    );
+    expect(content).toContain('"/api/brand/scrape"');
+    expect(content).toContain("BrandSuggestions");
   });
 });

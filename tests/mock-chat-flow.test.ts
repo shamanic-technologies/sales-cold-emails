@@ -54,6 +54,28 @@ describe("chat flow", () => {
     expect(content).toContain("connectCampaignStream");
   });
 
+  it("should scrape brand URL and include suggestions in question messages", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("scrapeBrand");
+    expect(content).toContain("suggestionsRef");
+    expect(content).toContain("suggestion");
+    expect(content).toContain("BrandSuggestions");
+  });
+
+  it("should map each question to a suggestion key from BrandSuggestions", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("SUGGESTION_KEY");
+    expect(content).toContain('ask_target_audience: "target_audience"');
+    expect(content).toContain('ask_value_for_target: "value_for_target"');
+    expect(content).toContain('ask_social_proof: "social_proof"');
+  });
+
   it("should handle SSE events for real-time results", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/components/chat/use-chat.ts"),

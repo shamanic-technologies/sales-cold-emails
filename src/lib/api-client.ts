@@ -3,6 +3,7 @@ import type {
   CreateCampaignRequest,
   Campaign,
   CampaignStats,
+  BrandSuggestions,
 } from "./types";
 
 export async function generateWorkflow(
@@ -49,4 +50,17 @@ export async function getCampaignStats(
 
 export function connectCampaignStream(campaignId: string): EventSource {
   return new EventSource(`/api/campaigns/${campaignId}/stream`);
+}
+
+export async function scrapeBrand(brandUrl: string): Promise<BrandSuggestions> {
+  const res = await fetch("/api/brand/scrape", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ brandUrl }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Brand scrape failed: ${text}`);
+  }
+  return res.json();
 }

@@ -2,10 +2,19 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { useAppStore } from "@/lib/store";
-import { generateWorkflow, createCampaign, connectCampaignStream } from "@/lib/api-client";
+import {
+  generateWorkflow,
+  createCampaign,
+  connectCampaignStream,
+  scrapeBrand,
+} from "@/lib/api-client";
 import { apiDagToWorkflowDag } from "@/lib/dag-transform";
 import { generateModifiedDag } from "@/lib/mock-data";
-import type { CreateCampaignRequest, GenerateWorkflowResponse } from "@/lib/types";
+import type {
+  CreateCampaignRequest,
+  GenerateWorkflowResponse,
+  BrandSuggestions,
+} from "@/lib/types";
 
 type ConversationState =
   | "scraping"
@@ -27,6 +36,15 @@ const GATHERING_STATES: ConversationState[] = [
   "ask_risk_reversal",
   "ask_social_proof",
 ];
+
+const SUGGESTION_KEY: Record<string, keyof BrandSuggestions> = {
+  ask_target_audience: "target_audience",
+  ask_value_for_target: "value_for_target",
+  ask_urgency: "urgency",
+  ask_scarcity: "scarcity",
+  ask_risk_reversal: "risk_reversal",
+  ask_social_proof: "social_proof",
+};
 
 const QUESTION_PROMPTS: Record<string, string> = {
   ask_target_audience:
@@ -50,6 +68,7 @@ export function useChat() {
   const gatheredRef = useRef<Record<string, string>>({});
   const workflowRef = useRef<GenerateWorkflowResponse | null>(null);
   const workflowLoadingRef = useRef(false);
+  const suggestionsRef = useRef<BrandSuggestions | null>(null);
 
   const onboardingInput = useAppStore((s) => s.onboardingInput);
   const messages = useAppStore((s) => s.messages);
@@ -91,7 +110,7 @@ export function useChat() {
       timestamp: Date.now(),
     });
 
-    // Fire workflow generation in parallel with questions
+    // Fire workflow generation in parallel with brand scraping and questions
     workflowLoadingRef.current = true;
     const description = `Cold email outreach campaign for ${onboardingInput.brandUrl} to ${objectiveLabel}. ${
       onboardingInput.objectiveUrl
@@ -105,7 +124,6 @@ export function useChat() {
         setWorkflowResponse(resp);
         workflowLoadingRef.current = false;
 
-        // Show DAG immediately — don't wait for questions to finish
         const dag = apiDagToWorkflowDag(resp.dag);
         setDag(dag);
 
@@ -121,17 +139,27 @@ export function useChat() {
         workflowLoadingRef.current = false;
       });
 
-    // Ask first question after a brief delay
-    setTimeout(() => {
-      stateRef.current = "ask_target_audience";
-      addMessage({
-        id: crypto.randomUUID(),
-        role: "system",
-        content: `Great, I'm on it! Now let's dial in your campaign.\n\n${QUESTION_PROMPTS.ask_target_audience}`,
-        timestamp: Date.now(),
+    // Fire brand scraping, then ask the first question with a suggestion
+    scrapeBrand(onboardingInput.brandUrl)
+      .then((suggestions) => {
+        suggestionsRef.current = suggestions;
+      })
+      .catch((err) => {
+        console.error("Brand scrape failed:", err);
+      })
+      .finally(() => {
+        stateRef.current = "ask_target_audience";
+        const suggestion =
+          suggestionsRef.current?.target_audience ?? undefined;
+        addMessage({
+          id: crypto.randomUUID(),
+          role: "system",
+          content: `Great, I've analyzed your site! Now let's dial in your campaign.\n\n${QUESTION_PROMPTS.ask_target_audience}`,
+          suggestion,
+          timestamp: Date.now(),
+        });
       });
-    }, 1500);
-  }, [onboardingInput, messages.length, addMessage, setWorkflowResponse]);
+  }, [onboardingInput, messages.length, addMessage, setWorkflowResponse, setDag]);
 
   const proposeDag = useCallback(() => {
     addMessage({
@@ -151,7 +179,7 @@ export function useChat() {
         timestamp: Date.now(),
       });
 
-      await new Promise((r) => setTimeout(r, 800 + Math.random() * 800));
+      await new Promise((r) => setTimeout(r, 600 + Math.random() * 400));
 
       const state = stateRef.current;
 
@@ -164,10 +192,16 @@ export function useChat() {
 
         if (nextState) {
           stateRef.current = nextState;
+          const suggestionKey = SUGGESTION_KEY[nextState];
+          const suggestion = suggestionKey
+            ? suggestionsRef.current?.[suggestionKey] ?? undefined
+            : undefined;
+
           addMessage({
             id: crypto.randomUUID(),
             role: "system",
             content: `Got it! ${QUESTION_PROMPTS[nextState]}`,
+            suggestion,
             timestamp: Date.now(),
           });
         } else {
@@ -180,7 +214,6 @@ export function useChat() {
               timestamp: Date.now(),
             });
 
-            // Poll until workflow is ready
             const waitForWorkflow = () => {
               if (!workflowLoadingRef.current && workflowRef.current) {
                 stateRef.current = "proposed";

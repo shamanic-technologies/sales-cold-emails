@@ -2,14 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
-import { Bot, User } from "lucide-react";
+import { Bot, User, ArrowRight } from "lucide-react";
 import type { ChatMessage } from "@/lib/types";
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
+  onUseSuggestion?: (text: string) => void;
 }
 
-export function ChatMessages({ messages }: ChatMessagesProps) {
+export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,44 +25,74 @@ export function ChatMessages({ messages }: ChatMessagesProps) {
     );
   }
 
+  // A suggestion is active if no user message follows it
+  const isSuggestionActive = (index: number) => {
+    for (let i = index + 1; i < messages.length; i++) {
+      if (messages[i].role === "user") return false;
+    }
+    return true;
+  };
+
   return (
     <div className="flex-1 overflow-y-auto p-4">
       <div className="flex flex-col gap-4">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex gap-3 ${
-              msg.role === "user" ? "flex-row-reverse" : ""
-            }`}
-          >
+        {messages.map((msg, idx) => (
+          <div key={msg.id}>
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-                msg.role === "system"
-                  ? "bg-indigo-100 text-indigo-600"
-                  : "bg-gray-100 text-gray-600"
+              className={`flex gap-3 ${
+                msg.role === "user" ? "flex-row-reverse" : ""
               }`}
             >
-              {msg.role === "system" ? (
-                <Bot className="h-4 w-4" />
-              ) : (
-                <User className="h-4 w-4" />
-              )}
+              <div
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                  msg.role === "system"
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {msg.role === "system" ? (
+                  <Bot className="h-4 w-4" />
+                ) : (
+                  <User className="h-4 w-4" />
+                )}
+              </div>
+              <div
+                className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
+                  msg.role === "user"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {msg.role === "system" ? (
+                  <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:text-gray-900">
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <p>{msg.content}</p>
+                )}
+              </div>
             </div>
-            <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
-                msg.role === "user"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {msg.role === "system" ? (
-                <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0.5 prose-strong:text-gray-900">
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+
+            {/* Suggestion block */}
+            {msg.suggestion && (
+              <div className="ml-11 mt-2">
+                <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 px-4 py-3">
+                  <p className="mb-2 text-xs font-medium text-indigo-500">
+                    Suggested answer
+                  </p>
+                  <p className="text-sm text-gray-700">{msg.suggestion}</p>
+                  {isSuggestionActive(idx) && onUseSuggestion && (
+                    <button
+                      onClick={() => onUseSuggestion(msg.suggestion!)}
+                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700"
+                    >
+                      Use this
+                      <ArrowRight className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <p>{msg.content}</p>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         ))}
         <div ref={bottomRef} />
