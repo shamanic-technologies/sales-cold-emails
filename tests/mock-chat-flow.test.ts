@@ -30,4 +30,26 @@ describe("mock chat flow", () => {
     );
     expect(content).toContain("generateModifiedDag");
   });
+
+  it("should ask campaign questions conversationally before proposing DAG", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/components/chat/use-mock-chat.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("target_audience");
+    expect(content).toContain("value_for_target");
+    expect(content).toContain("urgency");
+    expect(content).toContain("scarcity");
+    expect(content).toContain("risk_reversal");
+    expect(content).toContain("social_proof");
+  });
+
+  it("should start with brand scraping simulation", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/components/chat/use-mock-chat.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("scraping");
+    expect(content).toContain("brandUrl");
+  });
 });

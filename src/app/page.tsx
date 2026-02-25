@@ -52,9 +52,9 @@ export default function LandingPage() {
             <span className="gradient-text">actually get replies</span>
           </h1>
           <p className="mt-4 text-xl text-gray-600">
-            AI-powered outreach campaigns. Describe what you need, and we build
-            the workflow for you. Free with BYOK or pay-as-you-go with zero
-            markup.
+            AI-powered outreach campaigns. Enter your website, set your
+            objective, and we build the workflow for you. Free with BYOK or
+            pay-as-you-go with zero markup.
           </p>
           <HeroForm />
         </div>

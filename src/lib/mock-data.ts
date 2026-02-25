@@ -111,11 +111,11 @@ const MOCK_PROSPECTS = [
 export function generateMockEmail(
   company: string,
   person: string,
-  brand: string
+  brandDomain: string
 ): { subject: string; body: string } {
   return {
     subject: `Quick question about ${company}'s growth strategy`,
-    body: `Hi ${person.split(" ")[0]},\n\nI noticed ${company} has been scaling rapidly — congrats on the recent momentum.\n\nAt ${brand}, we help companies like yours automate outbound sales without sacrificing personalization. We've helped teams similar to yours increase reply rates by 3x while cutting time spent on prospecting by 80%.\n\nWould you be open to a quick 15-minute chat this week to see if there's a fit?\n\nBest,\nThe ${brand} Team`,
+    body: `Hi ${person.split(" ")[0]},\n\nI noticed ${company} has been scaling rapidly — congrats on the recent momentum.\n\nAt ${brandDomain}, we help companies like yours automate outbound sales without sacrificing personalization. We've helped teams similar to yours increase reply rates by 3x while cutting time spent on prospecting by 80%.\n\nWould you be open to a quick 15-minute chat this week to see if there's a fit?\n\nBest,\nThe ${brandDomain} Team`,
   };
 }
 

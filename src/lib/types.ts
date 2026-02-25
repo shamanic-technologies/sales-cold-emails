@@ -1,8 +1,7 @@
 export interface OnboardingInput {
-  description: string;
-  brand: string;
+  brandUrl: string;
   objective: "responses" | "clicks" | "meetings";
-  goal: string;
+  objectiveUrl?: string;
   budgetType: "one-off" | "daily" | "weekly" | "monthly";
   budgetAmount: number;
   pricingTier: "byok" | "pay-as-you-go";
