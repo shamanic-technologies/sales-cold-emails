@@ -11,7 +11,17 @@ export interface ChatMessage {
   id: string;
   role: "user" | "system";
   content: string;
+  suggestion?: string;
   timestamp: number;
+}
+
+export interface BrandSuggestions {
+  target_audience: string;
+  value_for_target: string;
+  urgency: string;
+  scarcity: string;
+  risk_reversal: string;
+  social_proof: string;
 }
 
 export type DagNodeType =

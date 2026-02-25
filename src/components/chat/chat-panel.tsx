@@ -25,7 +25,7 @@ export function ChatPanel() {
           Campaign Assistant
         </span>
       </div>
-      <ChatMessages messages={messages} />
+      <ChatMessages messages={messages} onUseSuggestion={handleSend} />
       <ChatInput onSend={handleSend} disabled={isTyping} />
     </div>
   );
