@@ -12,14 +12,15 @@ describe("API proxy pattern", () => {
     expect(content).toContain("isMockMode");
   });
 
-  it("should use Clerk auth() for token", () => {
+  it("should use X-API-Key header for authentication", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/lib/api-proxy.ts"),
       "utf-8"
     );
-    expect(content).toContain('auth()');
-    expect(content).toContain("getToken");
-    expect(content).toContain("Bearer");
+    expect(content).toContain("API_SERVICE_API_KEY");
+    expect(content).toContain("X-API-Key");
+    expect(content).not.toContain("Bearer");
+    expect(content).not.toContain("@clerk");
   });
 
   it("should have proxyToApi and proxySSE functions", () => {
