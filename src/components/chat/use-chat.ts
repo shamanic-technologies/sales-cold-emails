@@ -104,6 +104,17 @@ export function useChat() {
         workflowRef.current = resp;
         setWorkflowResponse(resp);
         workflowLoadingRef.current = false;
+
+        // Show DAG immediately — don't wait for questions to finish
+        const dag = apiDagToWorkflowDag(resp.dag);
+        setDag(dag);
+
+        addMessage({
+          id: crypto.randomUUID(),
+          role: "system",
+          content: `Your workflow is ready! Take a look at the DAG on the right. Keep answering the questions below so I can fine-tune your campaign.`,
+          timestamp: Date.now(),
+        });
       })
       .catch((err) => {
         console.error("Workflow generation failed:", err);
@@ -123,26 +134,13 @@ export function useChat() {
   }, [onboardingInput, messages.length, addMessage, setWorkflowResponse]);
 
   const proposeDag = useCallback(() => {
-    const resp = workflowRef.current;
-    if (!resp) return;
-
-    const dag = apiDagToWorkflowDag(resp.dag);
-    setDag(dag);
-
-    const objectiveLabel =
-      onboardingInput?.objective === "responses"
-        ? "maximize email replies"
-        : onboardingInput?.objective === "clicks"
-          ? "drive link clicks"
-          : "book meetings";
-
     addMessage({
       id: crypto.randomUUID(),
       role: "system",
-      content: `Excellent! I have everything I need. I've generated a custom **${resp.workflow.signatureName}** workflow to **${objectiveLabel}**.\n\n${resp.generatedDescription}\n\nTake a look at the workflow on the right. Say **"go"** to start the campaign, or tell me what you'd like to change.`,
+      content: `Excellent, I have everything I need! The workflow is ready on the right. Say **"go"** to start the campaign, or tell me what you'd like to change.`,
       timestamp: Date.now(),
     });
-  }, [addMessage, setDag, onboardingInput]);
+  }, [addMessage]);
 
   const sendMessage = useCallback(
     async (content: string) => {
