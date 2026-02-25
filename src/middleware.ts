@@ -18,7 +18,8 @@ const handler = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 
       if (
         req.nextUrl.pathname.startsWith("/sign-in") ||
-        req.nextUrl.pathname.startsWith("/sign-up")
+        req.nextUrl.pathname.startsWith("/sign-up") ||
+        req.nextUrl.pathname.startsWith("/sso-callback")
       ) {
         if (userId) {
           return NextResponse.redirect(new URL("/dashboard", req.url));
