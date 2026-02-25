@@ -80,6 +80,13 @@ export function HeroForm() {
     }));
   };
 
+  const normalizeUrl = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return trimmed;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return `https://${trimmed}`;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!canAdvance()) return;
@@ -91,9 +98,9 @@ export function HeroForm() {
 
     setSubmitting(true);
     const input: OnboardingInput = {
-      brandUrl: form.brandUrl,
+      brandUrl: normalizeUrl(form.brandUrl),
       objective: form.objective!,
-      objectiveUrl: form.objective !== "responses" ? form.objectiveUrl : undefined,
+      objectiveUrl: form.objective !== "responses" ? normalizeUrl(form.objectiveUrl) : undefined,
       budgetType: form.budgetType!,
       budgetAmount: Number(form.budgetAmount),
       pricingTier: "pay-as-you-go",
@@ -126,13 +133,13 @@ export function HeroForm() {
                 <div className="relative">
                   <Globe className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                   <input
-                    type="url"
+                    type="text"
                     autoFocus
                     value={form.brandUrl}
                     onChange={(e) =>
                       setForm((f) => ({ ...f, brandUrl: e.target.value }))
                     }
-                    placeholder="https://yourcompany.com"
+                    placeholder="yourcompany.com"
                     className="w-full rounded-xl border border-gray-200 py-4 pl-12 pr-5 text-lg outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
                   />
                 </div>
@@ -186,7 +193,7 @@ export function HeroForm() {
                     <CalendarDays className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                   )}
                   <input
-                    type="url"
+                    type="text"
                     autoFocus
                     value={form.objectiveUrl}
                     onChange={(e) =>
@@ -194,8 +201,8 @@ export function HeroForm() {
                     }
                     placeholder={
                       form.objective === "clicks"
-                        ? "https://yourcompany.com/landing-page"
-                        : "https://cal.com/yourname"
+                        ? "yourcompany.com/landing-page"
+                        : "cal.com/yourname"
                     }
                     className="w-full rounded-xl border border-gray-200 py-4 pl-12 pr-5 text-lg outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
                   />
