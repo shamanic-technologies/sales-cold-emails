@@ -85,7 +85,7 @@ export function generateModifiedDag(feedback: string): WorkflowDag {
   return base;
 }
 
-const MOCK_PROSPECTS = [
+export const MOCK_PROSPECTS = [
   { company: "Stripe", person: "Sarah Chen", title: "VP of Engineering", email: "sarah.c@stripe.com" },
   { company: "Notion", person: "Marcus Rivera", title: "Head of Growth", email: "marcus@notion.so" },
   { company: "Figma", person: "Emily Watson", title: "Director of Sales", email: "e.watson@figma.com" },

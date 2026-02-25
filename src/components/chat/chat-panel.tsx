@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useAppStore } from "@/lib/store";
-import { useMockChat } from "./use-mock-chat";
+import { useChat } from "./use-chat";
 import { ChatMessages } from "./chat-messages";
 import { ChatInput } from "./chat-input";
 
 export function ChatPanel() {
   const messages = useAppStore((s) => s.messages);
   const [isTyping, setIsTyping] = useState(false);
-  const { sendMessage } = useMockChat();
+  const { sendMessage } = useChat();
 
   const handleSend = async (content: string) => {
     setIsTyping(true);

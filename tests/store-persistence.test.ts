@@ -25,4 +25,15 @@ describe("zustand store", () => {
     expect(content).toContain("selectedResultId");
     expect(content).toContain("isApproved");
   });
+
+  it("should have campaign-related state for API integration", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/lib/store.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("workflowResponse");
+    expect(content).toContain("campaignId");
+    expect(content).toContain("campaignStats");
+    expect(content).toContain("campaignAnswers");
+  });
 });
