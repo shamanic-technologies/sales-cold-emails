@@ -1,7 +1,7 @@
 "use client";
 
 import { useSignIn } from "@clerk/nextjs";
-import { Mail } from "lucide-react";
+import Image from "next/image";
 
 export function SignInForm() {
   const { signIn, isLoaded } = useSignIn();
@@ -19,9 +19,7 @@ export function SignInForm() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
         <div className="mb-6 flex flex-col items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white">
-            <Mail className="h-6 w-6" />
-          </div>
+          <Image src="/logo.jpg" alt="Sales Cold Emails" width={48} height={48} className="h-12 w-12 rounded-xl" />
           <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
           <p className="text-sm text-gray-500">
             Sign in to your Sales Cold Emails account

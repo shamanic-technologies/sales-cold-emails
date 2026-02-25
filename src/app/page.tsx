@@ -1,4 +1,5 @@
-import { Mail, Zap, Target, BarChart3 } from "lucide-react";
+import Image from "next/image";
+import { Zap, Target, BarChart3 } from "lucide-react";
 import { HeroForm } from "@/components/landing/hero-form";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { Footer } from "@/components/landing/footer";
@@ -28,9 +29,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 z-50 w-full border-b border-white/20 bg-white/80 backdrop-blur-lg">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-              <Mail className="h-4 w-4" />
-            </div>
+            <Image src="/logo.jpg" alt="Sales Cold Emails" width={32} height={32} className="h-8 w-8 rounded-lg" />
             <span className="font-semibold text-gray-900">
               Sales Cold Emails
             </span>
