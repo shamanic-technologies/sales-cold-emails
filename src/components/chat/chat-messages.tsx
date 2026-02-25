@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
-import { Bot, User, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { User, ArrowRight } from "lucide-react";
 import type { ChatMessage } from "@/lib/types";
 
 interface ChatMessagesProps {
@@ -43,19 +44,19 @@ export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
                 msg.role === "user" ? "flex-row-reverse" : ""
               }`}
             >
-              <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-                  msg.role === "system"
-                    ? "bg-indigo-100 text-indigo-600"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                {msg.role === "system" ? (
-                  <Bot className="h-4 w-4" />
-                ) : (
+              {msg.role === "system" ? (
+                <Image
+                  src="/bot-avatar.jpg"
+                  alt="Bot"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 shrink-0 rounded-lg"
+                />
+              ) : (
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600">
                   <User className="h-4 w-4" />
-                )}
-              </div>
+                </div>
+              )}
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
                   msg.role === "user"
