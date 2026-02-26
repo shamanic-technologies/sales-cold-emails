@@ -36,4 +36,14 @@ describe("zustand store", () => {
     expect(content).toContain("campaignStats");
     expect(content).toContain("campaignAnswers");
   });
+
+  it("should persist chatSessionId and have streaming message helpers", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/lib/store.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("chatSessionId");
+    expect(content).toContain("updateMessage");
+    expect(content).toContain("updateMessageButtons");
+  });
 });

@@ -8,13 +8,16 @@ export async function POST() {
   if (!API_SERVICE_URL) {
     // Mock mode — set a fake key
     const cookieStore = await cookies();
-    cookieStore.set("mcpf_api_key", "mock_key", {
+    const mockOpts = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "strict" as const,
       path: "/",
       maxAge: 60 * 60 * 24 * 30, // 30 days
-    });
+    };
+    cookieStore.set("mcpf_api_key", "mock_key", mockOpts);
+    cookieStore.set("mcpf_org_id", "mock_org_id", mockOpts);
+    cookieStore.set("mcpf_user_id", "mock_user_id", mockOpts);
     return NextResponse.json({ ok: true, mock: true });
   }
 
@@ -51,17 +54,20 @@ export async function POST() {
     );
   }
 
-  const { apiKey } = await res.json();
+  const { apiKey, userId: provisionedUserId, orgId } = await res.json();
 
-  // Store API key in httpOnly cookie
+  // Store API key + identity in httpOnly cookies
   const cookieStore = await cookies();
-  cookieStore.set("mcpf_api_key", apiKey, {
+  const cookieOpts = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "strict" as const,
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
-  });
+  };
+  cookieStore.set("mcpf_api_key", apiKey, cookieOpts);
+  cookieStore.set("mcpf_org_id", orgId, cookieOpts);
+  cookieStore.set("mcpf_user_id", provisionedUserId, cookieOpts);
 
   return NextResponse.json({ ok: true });
 }

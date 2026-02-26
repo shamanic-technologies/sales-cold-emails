@@ -3,45 +3,44 @@ import fs from "fs";
 import path from "path";
 
 describe("chat flow", () => {
-  it("should generate initial DAG from onboarding input", () => {
+  it("should stream messages from chat-service via sendChatMessage", () => {
     const content = fs.readFileSync(
-      path.join(__dirname, "../src/lib/mock-data.ts"),
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
       "utf-8"
     );
-    expect(content).toContain("generateInitialDag");
-    expect(content).toContain("lead-source");
-    expect(content).toContain("email-generation");
+    expect(content).toContain("sendChatMessage");
+    expect(content).toContain("parseSSEStream");
+    expect(content).toContain("streamChatResponse");
   });
 
-  it('should trigger results on "go" approval', () => {
+  it("should extract campaign_answers JSON block from streamed text", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("extractCampaignAnswers");
+    expect(content).toContain("campaign_answers");
+    expect(content).toContain("CampaignAnswers");
+  });
+
+  it("should track chatSessionId for conversation continuity", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("chatSessionId");
+    expect(content).toContain("setChatSessionId");
+    expect(content).toContain("sessionId");
+  });
+
+  it('should trigger campaign launch on approval keywords', () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/components/chat/use-chat.ts"),
       "utf-8"
     );
     expect(content).toContain('"go"');
     expect(content).toContain("setApproved");
-    expect(content).toContain("results");
-  });
-
-  it("should support workflow modification on user feedback", () => {
-    const content = fs.readFileSync(
-      path.join(__dirname, "../src/components/chat/use-chat.ts"),
-      "utf-8"
-    );
-    expect(content).toContain("generateModifiedDag");
-  });
-
-  it("should ask campaign questions conversationally before proposing DAG", () => {
-    const content = fs.readFileSync(
-      path.join(__dirname, "../src/components/chat/use-chat.ts"),
-      "utf-8"
-    );
-    expect(content).toContain("target_audience");
-    expect(content).toContain("value_for_target");
-    expect(content).toContain("urgency");
-    expect(content).toContain("scarcity");
-    expect(content).toContain("risk_reversal");
-    expect(content).toContain("social_proof");
+    expect(content).toContain("launchCampaign");
   });
 
   it("should call real API endpoints for workflow and campaign", () => {
@@ -54,26 +53,14 @@ describe("chat flow", () => {
     expect(content).toContain("connectCampaignStream");
   });
 
-  it("should scrape brand URL and include suggestions in question messages", () => {
+  it("should scrape brand and pass suggestions as context", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/components/chat/use-chat.ts"),
       "utf-8"
     );
     expect(content).toContain("scrapeBrand");
-    expect(content).toContain("suggestionsRef");
-    expect(content).toContain("suggestion");
+    expect(content).toContain("brandSuggestions");
     expect(content).toContain("BrandSuggestions");
-  });
-
-  it("should map each question to a suggestion key from BrandSuggestions", () => {
-    const content = fs.readFileSync(
-      path.join(__dirname, "../src/components/chat/use-chat.ts"),
-      "utf-8"
-    );
-    expect(content).toContain("SUGGESTION_KEY");
-    expect(content).toContain('ask_target_audience: "target_audience"');
-    expect(content).toContain('ask_value_for_target: "value_for_target"');
-    expect(content).toContain('ask_social_proof: "social_proof"');
   });
 
   it("should handle SSE events for real-time results", () => {
@@ -85,5 +72,14 @@ describe("chat flow", () => {
     expect(content).toContain("lead_update");
     expect(content).toContain("addResult");
     expect(content).toContain("updateResult");
+  });
+
+  it("should update messages in-place during streaming", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/components/chat/use-chat.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("updateMessage");
+    expect(content).toContain("accumulated");
   });
 });

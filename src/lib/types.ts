@@ -12,6 +12,7 @@ export interface ChatMessage {
   role: "user" | "system";
   content: string;
   suggestion?: string;
+  buttons?: Array<{ label: string; value: string }>;
   timestamp: number;
 }
 

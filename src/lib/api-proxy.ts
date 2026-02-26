@@ -11,6 +11,16 @@ async function getApiKey(): Promise<string | null> {
   return cookieStore.get("mcpf_api_key")?.value ?? null;
 }
 
+export async function getOrgId(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get("mcpf_org_id")?.value ?? null;
+}
+
+export async function getUserId(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get("mcpf_user_id")?.value ?? null;
+}
+
 async function getHeaders(extra?: Record<string, string>): Promise<Record<string, string>> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
