@@ -1,17 +1,24 @@
+import { cookies } from "next/headers";
+
 const API_SERVICE_URL = process.env.API_SERVICE_URL;
-const API_SERVICE_API_KEY = process.env.API_SERVICE_API_KEY;
 
 export function isMockMode(): boolean {
   return !API_SERVICE_URL;
 }
 
-function getHeaders(extra?: Record<string, string>): Record<string, string> {
+async function getApiKey(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get("mcpf_api_key")?.value ?? null;
+}
+
+async function getHeaders(extra?: Record<string, string>): Promise<Record<string, string>> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...extra,
   };
-  if (API_SERVICE_API_KEY) {
-    headers["X-API-Key"] = API_SERVICE_API_KEY;
+  const apiKey = await getApiKey();
+  if (apiKey) {
+    headers["X-API-Key"] = apiKey;
   }
   return headers;
 }
@@ -26,7 +33,7 @@ export async function proxyToApi(
   const url = `${API_SERVICE_URL}${path}`;
   return fetch(url, {
     method: options?.method ?? "GET",
-    headers: getHeaders(),
+    headers: await getHeaders(),
     ...(options?.body ? { body: JSON.stringify(options.body) } : {}),
   });
 }
@@ -34,6 +41,6 @@ export async function proxyToApi(
 export async function proxySSE(path: string): Promise<Response> {
   const url = `${API_SERVICE_URL}${path}`;
   return fetch(url, {
-    headers: getHeaders({ Accept: "text/event-stream" }),
+    headers: await getHeaders({ Accept: "text/event-stream" }),
   });
 }

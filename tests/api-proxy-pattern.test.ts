@@ -12,13 +12,14 @@ describe("API proxy pattern", () => {
     expect(content).toContain("isMockMode");
   });
 
-  it("should use X-API-Key header for authentication", () => {
+  it("should read API key from cookie for per-user auth", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/lib/api-proxy.ts"),
       "utf-8"
     );
-    expect(content).toContain("API_SERVICE_API_KEY");
+    expect(content).toContain("mcpf_api_key");
     expect(content).toContain("X-API-Key");
+    expect(content).toContain("cookies");
     expect(content).not.toContain("Bearer");
     expect(content).not.toContain("@clerk");
   });
@@ -30,5 +31,27 @@ describe("API proxy pattern", () => {
     );
     expect(content).toContain("proxyToApi");
     expect(content).toContain("proxySSE");
+  });
+});
+
+describe("Auth provision route", () => {
+  it("should call MCPFactory /v1/auth/provision endpoint", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/app/api/auth/provision/route.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("/v1/auth/provision");
+    expect(content).toContain("mcpf_api_key");
+    expect(content).toContain("httpOnly");
+    expect(content).toContain("emailAddresses");
+  });
+
+  it("should support mock mode", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/app/api/auth/provision/route.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("mock_key");
+    expect(content).toContain("API_SERVICE_URL");
   });
 });
