@@ -163,11 +163,56 @@ export function useChat() {
   const chatSessionId = useAppStore((s) => s.chatSessionId);
   const setChatSessionId = useAppStore((s) => s.setChatSessionId);
 
+  // Load workflow: best → generate fallback
+  const loadWorkflow = useCallback(() => {
+    if (!onboardingInput || workflowLoadingRef.current) return;
+    workflowLoadingRef.current = true;
+    const apiObjective = onboardingInput.objective === "responses" ? "replies" : "clicks";
+    const objectiveLabel = getObjectiveLabel(onboardingInput.objective);
+
+    const handleReady = (resp: GenerateWorkflowResponse | BestWorkflowResponse) => {
+      workflowRef.current = resp;
+      setWorkflowResponse(resp);
+      setWorkflowError(null);
+      workflowLoadingRef.current = false;
+      const dag = apiDagToWorkflowDag(resp.dag);
+      setDag(dag);
+      addMessage({
+        id: crypto.randomUUID(),
+        role: "system",
+        content: "Your workflow is ready! Take a look at the DAG on the right. Keep chatting below so I can fine-tune your campaign.",
+        timestamp: Date.now(),
+      });
+    };
+
+    getBestWorkflow(apiObjective)
+      .then(handleReady)
+      .catch((err) => {
+        console.warn("Best workflow not available, falling back to generate:", err.message);
+        const description = `Cold email outreach campaign for ${onboardingInput.brandUrl} to ${objectiveLabel}. ${
+          onboardingInput.objectiveUrl
+            ? `Target URL: ${onboardingInput.objectiveUrl}. `
+            : ""
+        }Budget: $${onboardingInput.budgetAmount} ${onboardingInput.budgetType}.`;
+
+        generateWorkflow(description)
+          .then(handleReady)
+          .catch((genErr) => {
+            console.error("Workflow generation failed:", genErr);
+            workflowLoadingRef.current = false;
+            setWorkflowError("Could not load workflow. You can continue chatting — the workflow will be retried when you modify it.");
+          });
+      });
+  }, [onboardingInput, addMessage, setWorkflowResponse, setWorkflowError, setDag]);
+
   // Restore refs from persisted state on mount
   useEffect(() => {
     if (workflowResponse) {
       workflowRef.current = workflowResponse;
       workflowLoadingRef.current = false;
+    } else if (messages.length > 0 && onboardingInput) {
+      // Workflow failed on a previous session — retry loading
+      loadWorkflow();
     }
     if (campaignAnswers && Object.keys(campaignAnswers).length === 6) {
       answersRef.current = campaignAnswers as CampaignAnswers;
@@ -471,7 +516,7 @@ export function useChat() {
     setCampaignStats,
   ]);
 
-  // --- Initialization: scrape brand + generate workflow + first chat message ---
+  // --- Initialization: scrape brand + load workflow + first chat message ---
   useEffect(() => {
     if (initRef.current || messages.length > 0 || !onboardingInput) return;
     initRef.current = true;
@@ -480,53 +525,8 @@ export function useChat() {
     const brandDomain = extractDomain(onboardingInput.brandUrl);
     const objectiveLabel = getObjectiveLabel(onboardingInput.objective);
 
-    // Fetch best workflow (instant) — fall back to generate (slow) on 404
-    workflowLoadingRef.current = true;
-    const apiObjective = onboardingInput.objective === "responses" ? "replies" : "clicks";
-
-    const handleWorkflowReady = (resp: GenerateWorkflowResponse | BestWorkflowResponse) => {
-      workflowRef.current = resp;
-      setWorkflowResponse(resp);
-      setWorkflowError(null);
-      workflowLoadingRef.current = false;
-
-      const dag = apiDagToWorkflowDag(resp.dag);
-      setDag(dag);
-
-      addMessage({
-        id: crypto.randomUUID(),
-        role: "system",
-        content:
-          "Your workflow is ready! Take a look at the DAG on the right. Keep chatting below so I can fine-tune your campaign.",
-        timestamp: Date.now(),
-      });
-    };
-
-    getBestWorkflow(apiObjective)
-      .then(handleWorkflowReady)
-      .catch((err) => {
-        console.warn("Best workflow not available, falling back to generate:", err.message);
-        // Fallback: generate a new workflow (slow, LLM-based)
-        const description = `Cold email outreach campaign for ${onboardingInput.brandUrl} to ${objectiveLabel}. ${
-          onboardingInput.objectiveUrl
-            ? `Target URL: ${onboardingInput.objectiveUrl}. `
-            : ""
-        }Budget: $${onboardingInput.budgetAmount} ${onboardingInput.budgetType}.`;
-
-        generateWorkflow(description)
-          .then(handleWorkflowReady)
-          .catch((genErr) => {
-            console.error("Workflow generation failed:", genErr);
-            workflowLoadingRef.current = false;
-            setWorkflowError("Could not load workflow. You can continue chatting — the workflow will be retried when you modify it.");
-            addMessage({
-              id: crypto.randomUUID(),
-              role: "system",
-              content: "I couldn't load a workflow right now, but don't worry — keep chatting and we'll set one up for your campaign.",
-              timestamp: Date.now(),
-            });
-          });
-      });
+    // Load workflow (adds "workflow ready" message on success)
+    loadWorkflow();
 
     // Fire brand scraping, then send first chat message with full context
     scrapeBrand(onboardingInput.brandUrl)
@@ -552,10 +552,7 @@ export function useChat() {
   }, [
     onboardingInput,
     messages.length,
-    addMessage,
-    setWorkflowResponse,
-    setWorkflowError,
-    setDag,
+    loadWorkflow,
     streamChatResponse,
   ]);
 
