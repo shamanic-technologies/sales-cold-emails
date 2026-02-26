@@ -14,5 +14,12 @@ export async function GET() {
 
   const upstream = await proxyToBilling("/v1/accounts/transactions");
   const data = await upstream.json();
-  return NextResponse.json(data, { status: upstream.status });
+  // Billing-service wraps in { transactions: [...], has_more } with snake_case fields
+  const raw = Array.isArray(data?.transactions) ? data.transactions : [];
+  const transactions = raw.map((tx: { amount_cents?: number; description?: string; created_at?: string }) => ({
+    amount: tx.amount_cents ?? 0,
+    description: tx.description ?? "",
+    timestamp: tx.created_at ?? new Date().toISOString(),
+  }));
+  return NextResponse.json(transactions, { status: upstream.status });
 }
