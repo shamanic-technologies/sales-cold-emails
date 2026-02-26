@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { getOrgId, getUserId } from "@/lib/api-proxy";
+import { ensureAppConfigRegistered } from "@/instrumentation";
 
 const CHAT_SERVICE_URL = process.env.CHAT_SERVICE_URL;
 const CHAT_SERVICE_API_KEY = process.env.CHAT_SERVICE_API_KEY;
@@ -86,6 +87,9 @@ export async function POST(req: NextRequest) {
       { status: 401, headers: { "Content-Type": "application/json" } }
     );
   }
+
+  // Lazily register app config on first request (needs user's org/user context)
+  await ensureAppConfigRegistered(orgId, userId);
 
   const upstream = await fetch(`${CHAT_SERVICE_URL}/chat`, {
     method: "POST",

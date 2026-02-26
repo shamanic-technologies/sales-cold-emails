@@ -46,9 +46,10 @@ Follow this JSON block with a message like: "I have everything I need! The workf
 - Do not discuss pricing, your own capabilities, or anything outside campaign configuration
 `;
 
-export async function register() {
-  if (process.env.NEXT_RUNTIME !== "nodejs") return;
+let configRegistered = false;
 
+export async function ensureAppConfigRegistered(orgId: string, userId: string): Promise<void> {
+  if (configRegistered) return;
   if (!CHAT_SERVICE_URL || !CHAT_SERVICE_API_KEY) {
     console.log("[instrumentation] CHAT_SERVICE_URL not set, skipping app config registration");
     return;
@@ -60,6 +61,8 @@ export async function register() {
       headers: {
         "Content-Type": "application/json",
         "X-API-Key": CHAT_SERVICE_API_KEY,
+        "x-org-id": orgId,
+        "x-user-id": userId,
       },
       body: JSON.stringify({ systemPrompt: SYSTEM_PROMPT }),
     });
@@ -67,9 +70,21 @@ export async function register() {
     if (!res.ok) {
       console.error("[instrumentation] Failed to register app config:", res.status, await res.text());
     } else {
+      configRegistered = true;
       console.log("[instrumentation] App config registered successfully");
     }
   } catch (err) {
     console.error("[instrumentation] Error registering app config:", err);
   }
+}
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME !== "nodejs") return;
+
+  if (!CHAT_SERVICE_URL || !CHAT_SERVICE_API_KEY) {
+    console.log("[instrumentation] CHAT_SERVICE_URL not set, skipping app config registration");
+    return;
+  }
+
+  console.log("[instrumentation] App config will be registered lazily on first chat request");
 }
