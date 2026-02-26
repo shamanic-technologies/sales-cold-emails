@@ -43,4 +43,14 @@ describe("API client", () => {
     expect(content).toContain('"/api/brand/scrape"');
     expect(content).toContain("BrandSuggestions");
   });
+
+  it("should have sendChatMessage that calls /api/chat", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/lib/api-client.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("sendChatMessage");
+    expect(content).toContain('"/api/chat"');
+    expect(content).toContain("ChatRequest");
+  });
 });

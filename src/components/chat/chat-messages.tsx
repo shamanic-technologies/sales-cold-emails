@@ -94,6 +94,21 @@ export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
                 </div>
               </div>
             )}
+
+            {/* Quick-reply buttons from chat-service */}
+            {msg.buttons && msg.buttons.length > 0 && isSuggestionActive(idx) && (
+              <div className="ml-11 mt-2 flex flex-wrap gap-2">
+                {msg.buttons.map((btn) => (
+                  <button
+                    key={btn.value}
+                    onClick={() => onUseSuggestion?.(btn.value)}
+                    className="rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-600 transition hover:bg-indigo-50"
+                  >
+                    {btn.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
         <div ref={bottomRef} />

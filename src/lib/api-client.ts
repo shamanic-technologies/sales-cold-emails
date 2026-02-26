@@ -52,6 +52,25 @@ export function connectCampaignStream(campaignId: string): EventSource {
   return new EventSource(`/api/campaigns/${campaignId}/stream`);
 }
 
+export interface ChatRequest {
+  message: string;
+  sessionId?: string;
+  context?: Record<string, unknown>;
+}
+
+export async function sendChatMessage(req: ChatRequest): Promise<Response> {
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(req),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Chat request failed: ${text}`);
+  }
+  return res;
+}
+
 export async function scrapeBrand(brandUrl: string): Promise<BrandSuggestions> {
   const res = await fetch("/api/brand/scrape", {
     method: "POST",

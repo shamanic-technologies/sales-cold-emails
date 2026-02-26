@@ -32,6 +32,17 @@ describe("API proxy pattern", () => {
     expect(content).toContain("proxyToApi");
     expect(content).toContain("proxySSE");
   });
+
+  it("should expose getOrgId and getUserId helpers", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/lib/api-proxy.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("getOrgId");
+    expect(content).toContain("getUserId");
+    expect(content).toContain("mcpf_org_id");
+    expect(content).toContain("mcpf_user_id");
+  });
 });
 
 describe("Auth provision route", () => {
@@ -53,5 +64,16 @@ describe("Auth provision route", () => {
     );
     expect(content).toContain("mock_key");
     expect(content).toContain("API_SERVICE_URL");
+  });
+
+  it("should store orgId and userId cookies alongside apiKey", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/app/api/auth/provision/route.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("mcpf_org_id");
+    expect(content).toContain("mcpf_user_id");
+    expect(content).toContain("orgId");
+    expect(content).toContain("provisionedUserId");
   });
 });

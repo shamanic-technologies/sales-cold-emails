@@ -48,6 +48,12 @@ interface AppState {
   campaignAnswers: Partial<CampaignAnswers>;
   setCampaignAnswer: (key: keyof CampaignAnswers, value: string) => void;
   clearCampaignAnswers: () => void;
+
+  chatSessionId: string | null;
+  setChatSessionId: (id: string | null) => void;
+
+  updateMessage: (id: string, content: string) => void;
+  updateMessageButtons: (id: string, buttons: Array<{ label: string; value: string }>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -99,6 +105,22 @@ export const useAppStore = create<AppState>()(
           campaignAnswers: { ...state.campaignAnswers, [key]: value },
         })),
       clearCampaignAnswers: () => set({ campaignAnswers: {} }),
+
+      chatSessionId: null,
+      setChatSessionId: (id) => set({ chatSessionId: id }),
+
+      updateMessage: (id, content) =>
+        set((state) => ({
+          messages: state.messages.map((m) =>
+            m.id === id ? { ...m, content } : m
+          ),
+        })),
+      updateMessageButtons: (id, buttons) =>
+        set((state) => ({
+          messages: state.messages.map((m) =>
+            m.id === id ? { ...m, buttons } : m
+          ),
+        })),
     }),
     {
       name: "sales-cold-emails-store",
@@ -106,6 +128,7 @@ export const useAppStore = create<AppState>()(
         onboardingInput: state.onboardingInput,
         workflowResponse: state.workflowResponse,
         campaignId: state.campaignId,
+        chatSessionId: state.chatSessionId,
       }),
     }
   )
