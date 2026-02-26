@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isMockMode, proxyToApi } from "@/lib/api-proxy";
+import { isMockMode, proxyToApi, getOrgId, getUserId } from "@/lib/api-proxy";
 
 export async function POST(req: NextRequest) {
   if (isMockMode()) {
@@ -15,10 +15,15 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const body = await req.json();
+  const [body, orgId, userId] = await Promise.all([
+    req.json(),
+    getOrgId(),
+    getUserId(),
+  ]);
+
   const upstream = await proxyToApi("/v1/campaigns", {
     method: "POST",
-    body,
+    body: { ...body, orgId, userId },
   });
   const data = await upstream.json();
   return NextResponse.json(data, { status: upstream.status });
