@@ -60,6 +60,13 @@ describe("billing route handlers", () => {
     expect(src).toContain("isBillingMockMode");
     expect(src).toContain("/v1/accounts/transactions");
   });
+
+  it("transactions route should unwrap { transactions: [...] } and map snake_case fields", () => {
+    const src = read("../src/app/api/billing/transactions/route.ts");
+    expect(src).toContain("data?.transactions");
+    expect(src).toContain("amount_cents");
+    expect(src).toContain("created_at");
+  });
 });
 
 describe("billing types", () => {
