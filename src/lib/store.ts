@@ -42,6 +42,9 @@ interface AppState {
   workflowResponse: WorkflowResponseData | null;
   setWorkflowResponse: (resp: WorkflowResponseData | null) => void;
 
+  workflowError: string | null;
+  setWorkflowError: (error: string | null) => void;
+
   campaignId: string | null;
   setCampaignId: (id: string | null) => void;
 
@@ -96,6 +99,9 @@ export const useAppStore = create<AppState>()(
 
       workflowResponse: null,
       setWorkflowResponse: (resp) => set({ workflowResponse: resp }),
+
+      workflowError: null,
+      setWorkflowError: (error) => set({ workflowError: error }),
 
       campaignId: null,
       setCampaignId: (id) => set({ campaignId: id }),

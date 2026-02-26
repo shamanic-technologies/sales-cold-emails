@@ -154,6 +154,7 @@ export function useChat() {
   const updateResult = useAppStore((s) => s.updateResult);
   const workflowResponse = useAppStore((s) => s.workflowResponse);
   const setWorkflowResponse = useAppStore((s) => s.setWorkflowResponse);
+  const setWorkflowError = useAppStore((s) => s.setWorkflowError);
   const campaignId = useAppStore((s) => s.campaignId);
   const setCampaignId = useAppStore((s) => s.setCampaignId);
   const setCampaignStats = useAppStore((s) => s.setCampaignStats);
@@ -486,6 +487,7 @@ export function useChat() {
     const handleWorkflowReady = (resp: GenerateWorkflowResponse | BestWorkflowResponse) => {
       workflowRef.current = resp;
       setWorkflowResponse(resp);
+      setWorkflowError(null);
       workflowLoadingRef.current = false;
 
       const dag = apiDagToWorkflowDag(resp.dag);
@@ -516,6 +518,13 @@ export function useChat() {
           .catch((genErr) => {
             console.error("Workflow generation failed:", genErr);
             workflowLoadingRef.current = false;
+            setWorkflowError("Could not load workflow. You can continue chatting — the workflow will be retried when you modify it.");
+            addMessage({
+              id: crypto.randomUUID(),
+              role: "system",
+              content: "I couldn't load a workflow right now, but don't worry — keep chatting and we'll set one up for your campaign.",
+              timestamp: Date.now(),
+            });
           });
       });
 
@@ -545,6 +554,7 @@ export function useChat() {
     messages.length,
     addMessage,
     setWorkflowResponse,
+    setWorkflowError,
     setDag,
     streamChatResponse,
   ]);

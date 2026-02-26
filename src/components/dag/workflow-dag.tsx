@@ -9,15 +9,24 @@ import { useDagLayout } from "./use-dag-layout";
 
 export function WorkflowDag() {
   const currentDag = useAppStore((s) => s.currentDag);
+  const workflowError = useAppStore((s) => s.workflowError);
   const { nodes, edges } = useDagLayout(currentDag);
 
   const nodeTypes = useMemo(() => ({ dagStep: DagStepNode }), []);
 
   if (!currentDag) {
+    if (workflowError) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-sm text-gray-400">
+          <div className="text-2xl">&#9888;</div>
+          {workflowError}
+        </div>
+      );
+    }
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-gray-400">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-indigo-600" />
-        Generating your workflow...
+        Loading your workflow...
       </div>
     );
   }
