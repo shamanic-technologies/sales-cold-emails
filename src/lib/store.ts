@@ -126,9 +126,16 @@ export const useAppStore = create<AppState>()(
       name: "sales-cold-emails-store",
       partialize: (state) => ({
         onboardingInput: state.onboardingInput,
+        messages: state.messages,
+        currentDag: state.currentDag,
+        isApproved: state.isApproved,
+        dashboardView: state.dashboardView,
         workflowResponse: state.workflowResponse,
         campaignId: state.campaignId,
+        campaignAnswers: state.campaignAnswers,
         chatSessionId: state.chatSessionId,
+        results: state.results,
+        campaignStats: state.campaignStats,
       }),
     }
   )

@@ -127,14 +127,37 @@ export function useChat() {
   const addMessage = useAppStore((s) => s.addMessage);
   const setDag = useAppStore((s) => s.setDag);
   const setDashboardView = useAppStore((s) => s.setDashboardView);
+  const isApproved = useAppStore((s) => s.isApproved);
   const setApproved = useAppStore((s) => s.setApproved);
   const addResult = useAppStore((s) => s.addResult);
   const updateResult = useAppStore((s) => s.updateResult);
+  const workflowResponse = useAppStore((s) => s.workflowResponse);
   const setWorkflowResponse = useAppStore((s) => s.setWorkflowResponse);
+  const campaignId = useAppStore((s) => s.campaignId);
   const setCampaignId = useAppStore((s) => s.setCampaignId);
   const setCampaignStats = useAppStore((s) => s.setCampaignStats);
+  const campaignAnswers = useAppStore((s) => s.campaignAnswers);
   const chatSessionId = useAppStore((s) => s.chatSessionId);
   const setChatSessionId = useAppStore((s) => s.setChatSessionId);
+
+  // Restore refs from persisted state on mount
+  useEffect(() => {
+    if (workflowResponse) {
+      workflowRef.current = workflowResponse;
+      workflowLoadingRef.current = false;
+    }
+    if (campaignAnswers && Object.keys(campaignAnswers).length === 6) {
+      answersRef.current = campaignAnswers as CampaignAnswers;
+    }
+    if (campaignId) {
+      phaseRef.current = "running";
+    } else if (answersRef.current) {
+      phaseRef.current = "proposed";
+    } else if (messages.length > 0) {
+      phaseRef.current = "chatting";
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // --- Stream a chat response from the chat-service ---
   const streamChatResponse = useCallback(
