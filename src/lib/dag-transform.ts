@@ -64,7 +64,10 @@ function inferDescription(node: ApiDagNode): string {
 }
 
 export function apiDagToWorkflowDag(apiDag: ApiDag): WorkflowDag {
-  const nodes: DagNode[] = apiDag.nodes.map((n) => ({
+  const rawNodes = Array.isArray(apiDag.nodes) ? apiDag.nodes : [];
+  const rawEdges = Array.isArray(apiDag.edges) ? apiDag.edges : [];
+
+  const nodes: DagNode[] = rawNodes.map((n) => ({
     id: n.id,
     type: inferNodeType(n),
     label: inferLabel(n),
@@ -72,7 +75,7 @@ export function apiDagToWorkflowDag(apiDag: ApiDag): WorkflowDag {
     status: "pending" as const,
   }));
 
-  const edges: DagEdge[] = apiDag.edges.map((e, i) => ({
+  const edges: DagEdge[] = rawEdges.map((e, i) => ({
     id: `e-${i}`,
     source: e.from,
     target: e.to,
