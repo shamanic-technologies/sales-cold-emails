@@ -42,6 +42,19 @@ function stripCampaignAnswersBlock(text: string): string {
   return text.replace(/```campaign_answers\s*\n[\s\S]*?\n```\s*/g, "").trim();
 }
 
+function extractWorkflowHint(text: string): string | null {
+  const pattern = /```workflow_hint\s*\n([\s\S]*?)\n```/;
+  const match = text.match(pattern);
+  return match ? match[1].trim() : null;
+}
+
+function stripHiddenBlocks(text: string): string {
+  return text
+    .replace(/```campaign_answers\s*\n[\s\S]*?\n```\s*/g, "")
+    .replace(/```workflow_hint\s*\n[\s\S]*?\n```\s*/g, "")
+    .trim();
+}
+
 async function* parseSSEStream(
   body: ReadableStream<Uint8Array>
 ): AsyncGenerator<{ type: string; [key: string]: unknown }> {
@@ -168,6 +181,46 @@ export function useChat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // --- Regenerate workflow when chat-service returns a workflow_hint ---
+  const regenerateWorkflow = useCallback(async (hint: string) => {
+    workflowLoadingRef.current = true;
+    addMessage({
+      id: crypto.randomUUID(),
+      role: "system",
+      content: "Regenerating your workflow based on your changes...",
+      timestamp: Date.now(),
+    });
+
+    const objectiveLabel = getObjectiveLabel(onboardingInput!.objective);
+    const description = `${hint}. Campaign for ${onboardingInput!.brandUrl} to ${objectiveLabel}.`;
+
+    try {
+      const resp = await generateWorkflow(description);
+      workflowRef.current = resp;
+      setWorkflowResponse(resp);
+      workflowLoadingRef.current = false;
+
+      const dag = apiDagToWorkflowDag(resp.dag);
+      setDag(dag);
+
+      addMessage({
+        id: crypto.randomUUID(),
+        role: "system",
+        content: "Workflow updated! Check the DAG on the right.",
+        timestamp: Date.now(),
+      });
+    } catch (err) {
+      console.error("Workflow regeneration failed:", err);
+      workflowLoadingRef.current = false;
+      addMessage({
+        id: crypto.randomUUID(),
+        role: "system",
+        content: "Failed to update the workflow. You can try again or launch with the current one.",
+        timestamp: Date.now(),
+      });
+    }
+  }, [onboardingInput, addMessage, setWorkflowResponse, setDag]);
+
   // --- Stream a chat response from the chat-service ---
   const streamChatResponse = useCallback(
     async (message: string, context?: Record<string, unknown>) => {
@@ -205,7 +258,7 @@ export function useChat() {
 
           if (event.type === "token" && typeof event.content === "string") {
             accumulated += event.content;
-            useAppStore.getState().updateMessage(msgId, stripCampaignAnswersBlock(accumulated));
+            useAppStore.getState().updateMessage(msgId, stripHiddenBlocks(accumulated));
             continue;
           }
 
@@ -225,7 +278,7 @@ export function useChat() {
         }
 
         // Final display text
-        useAppStore.getState().updateMessage(msgId, stripCampaignAnswersBlock(accumulated));
+        useAppStore.getState().updateMessage(msgId, stripHiddenBlocks(accumulated));
 
         // Check for campaign_answers
         const answers = extractCampaignAnswers(accumulated);
@@ -247,6 +300,12 @@ export function useChat() {
             waitForWorkflow();
           }
         }
+
+        // Check for workflow_hint — regenerate workflow if found
+        const workflowHint = extractWorkflowHint(accumulated);
+        if (workflowHint) {
+          await regenerateWorkflow(workflowHint);
+        }
       } catch (err) {
         console.error("Chat stream error:", err);
         addMessage({
@@ -259,7 +318,7 @@ export function useChat() {
         streamingRef.current = false;
       }
     },
-    [chatSessionId, addMessage, setChatSessionId, setCampaignAnswers]
+    [chatSessionId, addMessage, setChatSessionId, setCampaignAnswers, regenerateWorkflow]
   );
 
   // --- Launch campaign (preserved from original) ---
