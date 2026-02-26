@@ -4,14 +4,13 @@ import { useState, type FormEvent } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Loader2, Globe, Link2, CalendarDays } from "lucide-react";
+import { ArrowRight, Loader2, Globe, Link2 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import type { OnboardingInput } from "@/lib/types";
 
 const OBJECTIVES = [
   { value: "responses" as const, label: "Get Responses", icon: "💬", description: "Maximize email replies" },
   { value: "clicks" as const, label: "Get Link Clicks", icon: "🔗", description: "Drive traffic to a URL" },
-  { value: "meetings" as const, label: "Book Meetings", icon: "📅", description: "Fill your calendar" },
 ];
 
 const BUDGET_TYPES = [
@@ -46,10 +45,10 @@ export function HeroForm() {
   const router = useRouter();
   const setOnboardingInput = useAppStore((s) => s.setOnboardingInput);
 
-  // Dynamic steps — objective-url only appears for clicks/meetings
+  // Dynamic steps — objective-url only appears for clicks
   const steps: Step[] = (() => {
     const base: Step[] = ["brand-url", "objective"];
-    if (form.objective === "clicks" || form.objective === "meetings") {
+    if (form.objective === "clicks") {
       base.push("objective-url");
     }
     base.push("budget");
@@ -154,7 +153,7 @@ export function HeroForm() {
                 <label className="text-left text-lg font-semibold text-gray-900">
                   What do you want to achieve?
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   {OBJECTIVES.map((obj) => (
                     <button
                       key={obj.value}
@@ -182,16 +181,10 @@ export function HeroForm() {
             {currentStep === "objective-url" && (
               <div className="flex flex-col gap-4">
                 <label className="text-left text-lg font-semibold text-gray-900">
-                  {form.objective === "clicks"
-                    ? "Which URL should recipients click?"
-                    : "What is your meeting/calendar link?"}
+                  Which URL should recipients click?
                 </label>
                 <div className="relative">
-                  {form.objective === "clicks" ? (
-                    <Link2 className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                  ) : (
-                    <CalendarDays className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                  )}
+                  <Link2 className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
                     autoFocus
@@ -199,19 +192,13 @@ export function HeroForm() {
                     onChange={(e) =>
                       setForm((f) => ({ ...f, objectiveUrl: e.target.value }))
                     }
-                    placeholder={
-                      form.objective === "clicks"
-                        ? "yourcompany.com/landing-page"
-                        : "cal.com/yourname"
-                    }
+                    placeholder="yourcompany.com/landing-page"
                     className="w-full rounded-xl border border-gray-200 py-4 pl-12 pr-5 text-lg outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
                   />
                 </div>
-                {form.objective === "clicks" && (
-                  <p className="text-sm text-gray-500">
-                    Pre-filled with your brand URL. Change it if you want a different destination.
-                  </p>
-                )}
+                <p className="text-sm text-gray-500">
+                  Pre-filled with your brand URL. You can also use a Calendly link here.
+                </p>
               </div>
             )}
 

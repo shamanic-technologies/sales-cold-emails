@@ -30,13 +30,13 @@ describe("landing form persistence", () => {
     expect(content).toContain("brand-url");
   });
 
-  it("should have conditional objective-url step for clicks and meetings", () => {
+  it("should have conditional objective-url step for clicks only", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/components/landing/hero-form.tsx"),
       "utf-8"
     );
     expect(content).toContain("objective-url");
     expect(content).toContain("clicks");
-    expect(content).toContain("meetings");
+    expect(content).not.toContain("meetings");
   });
 });
