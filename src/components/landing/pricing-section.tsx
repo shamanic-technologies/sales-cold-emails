@@ -37,9 +37,9 @@ const PLANS = [
 
 export function PricingSection() {
   return (
-    <section className="bg-white py-24 px-4">
+    <section className="bg-white px-4 py-16 sm:py-24">
       <div className="mx-auto max-w-4xl text-center">
-        <h2 className="text-3xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
           Simple, transparent pricing
         </h2>
         <p className="mt-3 text-lg text-gray-500">
@@ -50,7 +50,7 @@ export function PricingSection() {
           {PLANS.map((plan) => (
             <div
               key={plan.name}
-              className={`relative flex flex-col rounded-2xl border-2 p-8 text-left transition ${
+              className={`relative flex flex-col rounded-2xl border-2 p-5 text-left transition sm:p-6 md:p-8 ${
                 plan.highlighted
                   ? "border-indigo-600 shadow-lg shadow-indigo-100"
                   : "border-gray-200"
@@ -81,7 +81,7 @@ export function PricingSection() {
               </div>
 
               <div className="mt-6">
-                <span className="text-4xl font-bold text-gray-900">
+                <span className="text-3xl font-bold text-gray-900 sm:text-4xl">
                   {plan.price}
                 </span>
                 <span className="ml-2 text-gray-500">/ {plan.priceLabel}</span>

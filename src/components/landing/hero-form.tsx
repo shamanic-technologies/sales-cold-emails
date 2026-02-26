@@ -114,8 +114,8 @@ export function HeroForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto mt-10 w-full max-w-2xl">
-      <div className="relative min-h-[200px] overflow-hidden rounded-2xl bg-white p-8 shadow-xl">
+    <form onSubmit={handleSubmit} className="mx-auto mt-8 w-full max-w-2xl sm:mt-10">
+      <div className="relative min-h-[200px] overflow-hidden rounded-2xl bg-white p-4 shadow-xl sm:p-6 md:p-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -126,7 +126,7 @@ export function HeroForm() {
           >
             {currentStep === "brand-url" && (
               <div className="flex flex-col gap-4">
-                <label className="text-left text-lg font-semibold text-gray-900">
+                <label className="text-left text-base font-semibold text-gray-900 sm:text-lg">
                   What is your brand&apos;s website?
                 </label>
                 <div className="relative">
@@ -139,7 +139,7 @@ export function HeroForm() {
                       setForm((f) => ({ ...f, brandUrl: e.target.value }))
                     }
                     placeholder="yourcompany.com"
-                    className="w-full rounded-xl border border-gray-200 py-4 pl-12 pr-5 text-lg outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                    className="w-full rounded-xl border border-gray-200 py-3 pl-12 pr-5 text-base outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 sm:py-4 sm:text-lg"
                   />
                 </div>
                 <p className="text-sm text-gray-500">
@@ -150,7 +150,7 @@ export function HeroForm() {
 
             {currentStep === "objective" && (
               <div className="flex flex-col gap-4">
-                <label className="text-left text-lg font-semibold text-gray-900">
+                <label className="text-left text-base font-semibold text-gray-900 sm:text-lg">
                   What do you want to achieve?
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -180,7 +180,7 @@ export function HeroForm() {
 
             {currentStep === "objective-url" && (
               <div className="flex flex-col gap-4">
-                <label className="text-left text-lg font-semibold text-gray-900">
+                <label className="text-left text-base font-semibold text-gray-900 sm:text-lg">
                   Which URL should recipients click?
                 </label>
                 <div className="relative">
@@ -193,7 +193,7 @@ export function HeroForm() {
                       setForm((f) => ({ ...f, objectiveUrl: e.target.value }))
                     }
                     placeholder="yourcompany.com/landing-page"
-                    className="w-full rounded-xl border border-gray-200 py-4 pl-12 pr-5 text-lg outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                    className="w-full rounded-xl border border-gray-200 py-3 pl-12 pr-5 text-base outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 sm:py-4 sm:text-lg"
                   />
                 </div>
                 <p className="text-sm text-gray-500">
@@ -204,10 +204,10 @@ export function HeroForm() {
 
             {currentStep === "budget" && (
               <div className="flex flex-col gap-4">
-                <label className="text-left text-lg font-semibold text-gray-900">
+                <label className="text-left text-base font-semibold text-gray-900 sm:text-lg">
                   What is your budget?
                 </label>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <input
                     type="number"
                     autoFocus
@@ -216,7 +216,7 @@ export function HeroForm() {
                       setForm((f) => ({ ...f, budgetAmount: e.target.value }))
                     }
                     placeholder="Amount ($)"
-                    className="flex-1 rounded-xl border border-gray-200 px-5 py-4 text-lg outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                    className="w-full rounded-xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 sm:flex-1 sm:text-lg"
                   />
                   <div className="grid grid-cols-2 gap-2">
                     {BUDGET_TYPES.map((bt) => (
