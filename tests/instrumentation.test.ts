@@ -11,7 +11,7 @@ describe("instrumentation", () => {
   describe("chat config", () => {
     it("should register app config lazily via ensureAppConfigRegistered", () => {
       expect(content).toContain("ensureAppConfigRegistered");
-      expect(content).toContain("/apps/sales-cold-emails/config");
+      expect(content).toContain("/apps/${APP_ID}/config");
       expect(content).toContain("systemPrompt");
     });
 
