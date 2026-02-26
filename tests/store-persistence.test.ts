@@ -47,6 +47,18 @@ describe("zustand store", () => {
     expect(content).toContain("updateMessageButtons");
   });
 
+  it("should have a merge function that validates arrays on rehydration", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/lib/store.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("merge:");
+    expect(content).toContain("Array.isArray(p?.messages)");
+    expect(content).toContain("Array.isArray(p?.results)");
+    expect(content).toContain("Array.isArray(p.currentDag.nodes)");
+    expect(content).toContain("Array.isArray(p.currentDag.edges)");
+  });
+
   it("should persist chat and campaign state across page refreshes", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/lib/store.ts"),

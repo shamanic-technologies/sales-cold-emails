@@ -30,4 +30,13 @@ describe("DAG transformer", () => {
     );
     expect(content).toContain("export function apiDagToWorkflowDag");
   });
+
+  it("should guard against non-array nodes and edges", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/lib/dag-transform.ts"),
+      "utf-8"
+    );
+    expect(content).toContain("Array.isArray(apiDag.nodes)");
+    expect(content).toContain("Array.isArray(apiDag.edges)");
+  });
 });

@@ -148,6 +148,23 @@ export const useAppStore = create<AppState>()(
         results: state.results,
         campaignStats: state.campaignStats,
       }),
+      merge: (persisted, current) => {
+        const p = persisted as Partial<AppState> | undefined;
+        return {
+          ...current,
+          ...p,
+          // Ensure arrays are always arrays after rehydration
+          messages: Array.isArray(p?.messages) ? p.messages : [],
+          results: Array.isArray(p?.results) ? p.results : [],
+          // Ensure currentDag has valid arrays
+          currentDag:
+            p?.currentDag &&
+            Array.isArray(p.currentDag.nodes) &&
+            Array.isArray(p.currentDag.edges)
+              ? p.currentDag
+              : null,
+        };
+      },
     }
   )
 );
