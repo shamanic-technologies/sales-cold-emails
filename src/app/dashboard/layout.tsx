@@ -11,10 +11,12 @@ export default async function DashboardLayout({
 }) {
   const cookieStore = await cookies();
   const hasApiKey = !!cookieStore.get("mcpf_api_key")?.value;
+  const hasOrgId = !!cookieStore.get("mcpf_org_id")?.value;
+  const isProvisioned = hasApiKey && hasOrgId;
 
   return (
     <DashboardShell>
-      {hasApiKey ? children : <ProvisionGuard>{children}</ProvisionGuard>}
+      {isProvisioned ? children : <ProvisionGuard>{children}</ProvisionGuard>}
     </DashboardShell>
   );
 }
