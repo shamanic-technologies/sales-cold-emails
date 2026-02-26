@@ -39,7 +39,8 @@ describe("instrumentation", () => {
       expect(content).toContain("registerAppSecrets");
     });
 
-    it("should register stripe and stripe-webhook providers", () => {
+    it("should register gemini, stripe, and stripe-webhook providers", () => {
+      expect(content).toContain('"gemini"');
       expect(content).toContain('"stripe"');
       expect(content).toContain('"stripe-webhook"');
     });

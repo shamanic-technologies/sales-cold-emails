@@ -88,7 +88,7 @@ export async function ensureAppConfigRegistered(orgId: string, userId: string): 
   }
 }
 
-// ── Key-service: register Stripe secrets ────────────────────────────────────
+// ── Key-service: register app secrets ────────────────────────────────────────
 
 async function registerAppKey(provider: string, apiKey: string): Promise<void> {
   if (!KEY_SERVICE_URL || !KEY_SERVICE_API_KEY) {
@@ -114,9 +114,13 @@ async function registerAppKey(provider: string, apiKey: string): Promise<void> {
 async function registerAppSecrets(): Promise<void> {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const geminiKey = process.env.GEMINI_API_KEY;
 
   const registrations: Promise<void>[] = [];
 
+  if (geminiKey) {
+    registrations.push(registerAppKey("gemini", geminiKey));
+  }
   if (stripeKey) {
     registrations.push(registerAppKey("stripe", stripeKey));
   }
@@ -126,9 +130,9 @@ async function registerAppSecrets(): Promise<void> {
 
   if (registrations.length > 0) {
     await Promise.all(registrations);
-    console.log("[instrumentation] Stripe secrets registered with key-service");
+    console.log("[instrumentation] App secrets registered with key-service");
   } else {
-    console.log("[instrumentation] No Stripe secrets found in env, skipping key-service registration");
+    console.log("[instrumentation] No secrets found in env, skipping key-service registration");
   }
 }
 
