@@ -1,6 +1,6 @@
 export interface OnboardingInput {
   brandUrl: string;
-  objective: "responses" | "clicks" | "meetings";
+  objective: "responses" | "clicks";
   objectiveUrl?: string;
   budgetType: "one-off" | "daily" | "weekly" | "monthly";
   budgetAmount: number;
