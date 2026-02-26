@@ -112,7 +112,7 @@ async function registerAppKey(provider: string, apiKey: string): Promise<void> {
 }
 
 async function registerAppSecrets(): Promise<void> {
-  const stripeKey = process.env.STRIPE_API_KEY;
+  const stripeKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const geminiKey = process.env.GEMINI_API_KEY;
 
