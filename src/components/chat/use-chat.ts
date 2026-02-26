@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useAppStore } from "@/lib/store";
 import {
+  getBestWorkflow,
   generateWorkflow,
   createCampaign,
   connectCampaignStream,
@@ -13,9 +14,16 @@ import { apiDagToWorkflowDag } from "@/lib/dag-transform";
 import type {
   CreateCampaignRequest,
   GenerateWorkflowResponse,
+  BestWorkflowResponse,
   BrandSuggestions,
   CampaignAnswers,
 } from "@/lib/types";
+
+/** Common shape stored in workflowRef — both best and generated have these */
+type WorkflowData = {
+  workflow: { name: string; id: string; signatureName: string };
+  dag: GenerateWorkflowResponse["dag"];
+};
 
 // --- Helpers ---
 
@@ -116,7 +124,7 @@ export function useChat() {
   const phaseRef = useRef<Phase>("init");
   const cleanupRef = useRef<(() => void) | null>(null);
   const initRef = useRef(false);
-  const workflowRef = useRef<GenerateWorkflowResponse | null>(null);
+  const workflowRef = useRef<WorkflowData | null>(null);
   const workflowLoadingRef = useRef(false);
   const suggestionsRef = useRef<BrandSuggestions | null>(null);
   const answersRef = useRef<CampaignAnswers | null>(null);
@@ -412,34 +420,44 @@ export function useChat() {
     const brandDomain = extractDomain(onboardingInput.brandUrl);
     const objectiveLabel = getObjectiveLabel(onboardingInput.objective);
 
-    // Fire workflow generation in parallel
+    // Fetch best workflow (instant) — fall back to generate (slow) on 404
     workflowLoadingRef.current = true;
-    const description = `Cold email outreach campaign for ${onboardingInput.brandUrl} to ${objectiveLabel}. ${
-      onboardingInput.objectiveUrl
-        ? `Target URL: ${onboardingInput.objectiveUrl}. `
-        : ""
-    }Budget: $${onboardingInput.budgetAmount} ${onboardingInput.budgetType}.`;
+    const apiObjective = onboardingInput.objective === "responses" ? "replies" : "clicks";
 
-    generateWorkflow(description)
-      .then((resp) => {
-        workflowRef.current = resp;
-        setWorkflowResponse(resp);
-        workflowLoadingRef.current = false;
+    const handleWorkflowReady = (resp: GenerateWorkflowResponse | BestWorkflowResponse) => {
+      workflowRef.current = resp;
+      setWorkflowResponse(resp);
+      workflowLoadingRef.current = false;
 
-        const dag = apiDagToWorkflowDag(resp.dag);
-        setDag(dag);
+      const dag = apiDagToWorkflowDag(resp.dag);
+      setDag(dag);
 
-        addMessage({
-          id: crypto.randomUUID(),
-          role: "system",
-          content:
-            "Your workflow is ready! Take a look at the DAG on the right. Keep chatting below so I can fine-tune your campaign.",
-          timestamp: Date.now(),
-        });
-      })
+      addMessage({
+        id: crypto.randomUUID(),
+        role: "system",
+        content:
+          "Your workflow is ready! Take a look at the DAG on the right. Keep chatting below so I can fine-tune your campaign.",
+        timestamp: Date.now(),
+      });
+    };
+
+    getBestWorkflow(apiObjective)
+      .then(handleWorkflowReady)
       .catch((err) => {
-        console.error("Workflow generation failed:", err);
-        workflowLoadingRef.current = false;
+        console.warn("Best workflow not available, falling back to generate:", err.message);
+        // Fallback: generate a new workflow (slow, LLM-based)
+        const description = `Cold email outreach campaign for ${onboardingInput.brandUrl} to ${objectiveLabel}. ${
+          onboardingInput.objectiveUrl
+            ? `Target URL: ${onboardingInput.objectiveUrl}. `
+            : ""
+        }Budget: $${onboardingInput.budgetAmount} ${onboardingInput.budgetType}.`;
+
+        generateWorkflow(description)
+          .then(handleWorkflowReady)
+          .catch((genErr) => {
+            console.error("Workflow generation failed:", genErr);
+            workflowLoadingRef.current = false;
+          });
       });
 
     // Fire brand scraping, then send first chat message with full context

@@ -7,9 +7,12 @@ import type {
   ResultRow,
   DashboardView,
   GenerateWorkflowResponse,
+  BestWorkflowResponse,
   CampaignStats,
   CampaignAnswers,
 } from "./types";
+
+type WorkflowResponseData = GenerateWorkflowResponse | BestWorkflowResponse;
 
 interface AppState {
   onboardingInput: OnboardingInput | null;
@@ -36,8 +39,8 @@ interface AppState {
   isApproved: boolean;
   setApproved: (approved: boolean) => void;
 
-  workflowResponse: GenerateWorkflowResponse | null;
-  setWorkflowResponse: (resp: GenerateWorkflowResponse | null) => void;
+  workflowResponse: WorkflowResponseData | null;
+  setWorkflowResponse: (resp: WorkflowResponseData | null) => void;
 
   campaignId: string | null;
   setCampaignId: (id: string | null) => void;

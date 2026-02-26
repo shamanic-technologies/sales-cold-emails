@@ -1,5 +1,6 @@
 import type {
   GenerateWorkflowResponse,
+  BestWorkflowResponse,
   CreateCampaignRequest,
   Campaign,
   CampaignStats,
@@ -8,6 +9,23 @@ import type {
   BillingTransaction,
   CheckoutSessionResponse,
 } from "./types";
+
+export async function getBestWorkflow(
+  objective: "replies" | "clicks"
+): Promise<BestWorkflowResponse> {
+  const params = new URLSearchParams({
+    category: "sales",
+    channel: "email",
+    audienceType: "cold-outreach",
+    objective,
+  });
+  const res = await fetch(`/api/workflows/best?${params}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Best workflow fetch failed (${res.status}): ${text}`);
+  }
+  return res.json();
+}
 
 export async function generateWorkflow(
   description: string,

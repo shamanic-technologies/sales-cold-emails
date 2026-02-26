@@ -172,6 +172,27 @@ export interface CampaignAnswers {
   social_proof: string;
 }
 
+export interface BestWorkflowStats {
+  totalCostInUsdCents: number;
+  totalOutcomes: number;
+  costPerOutcome: number | null;
+  completedRuns: number;
+}
+
+export interface BestWorkflowResponse {
+  workflow: {
+    id: string;
+    name: string;
+    category: string;
+    channel: string;
+    audienceType: string;
+    signature: string;
+    signatureName: string;
+  };
+  dag: ApiDag;
+  stats: BestWorkflowStats;
+}
+
 // --- Billing Types ---
 
 export interface BillingBalance {
