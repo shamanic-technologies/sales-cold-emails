@@ -48,20 +48,20 @@ export function ProgressStats() {
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-4 border-b border-gray-200 bg-gray-50 p-4">
+    <div className="grid grid-cols-2 gap-2 border-b border-gray-200 bg-gray-50 p-3 sm:gap-3 sm:p-4 md:grid-cols-4">
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm"
+          className="flex items-center gap-2 rounded-xl bg-white p-2 shadow-sm sm:gap-3 sm:p-3"
         >
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-lg ${stat.color}`}
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-9 sm:w-9 ${stat.color}`}
           >
             <stat.icon className="h-4 w-4" />
           </div>
-          <div>
-            <p className="text-xl font-bold text-gray-900">{stat.value}</p>
-            <p className="text-xs text-gray-500">{stat.label}</p>
+          <div className="min-w-0">
+            <p className="text-lg font-bold text-gray-900 sm:text-xl">{stat.value}</p>
+            <p className="truncate text-xs text-gray-500">{stat.label}</p>
           </div>
         </div>
       ))}

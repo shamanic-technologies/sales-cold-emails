@@ -44,13 +44,13 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="gradient-hero pt-32 pb-24 px-4">
+      <section className="gradient-hero px-4 pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-5xl font-bold leading-tight tracking-tight text-gray-900">
+          <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl md:text-5xl">
             Cold emails that{" "}
             <span className="gradient-text">actually get replies</span>
           </h1>
-          <p className="mt-4 text-xl text-gray-600">
+          <p className="mt-4 text-base text-gray-600 sm:text-lg md:text-xl">
             AI-powered outreach campaigns. Enter your website, set your
             objective, and we build the workflow for you. Free with BYOK or
             pay-as-you-go with zero markup.
@@ -60,9 +60,9 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="bg-white py-24 px-4">
+      <section className="bg-white px-4 py-16 sm:py-24">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-center text-3xl font-bold text-gray-900">
+          <h2 className="text-center text-2xl font-bold text-gray-900 sm:text-3xl">
             How it works
           </h2>
           <div className="mt-12 grid gap-8 md:grid-cols-3">

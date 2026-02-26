@@ -76,7 +76,7 @@ export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
 
             {/* Suggestion block */}
             {msg.suggestion && (
-              <div className="ml-11 mt-2">
+              <div className="ml-11 mt-2 mr-2">
                 <div className="rounded-xl border border-violet-200 bg-violet-50/50 px-4 py-3">
                   <p className="mb-2 text-xs font-medium text-violet-500">
                     Suggested answer
@@ -97,7 +97,7 @@ export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
 
             {/* Quick-reply buttons from chat-service */}
             {msg.buttons && msg.buttons.length > 0 && isSuggestionActive(idx) && (
-              <div className="ml-11 mt-2 flex flex-wrap gap-2">
+              <div className="ml-11 mt-2 mr-2 flex flex-wrap gap-2">
                 {msg.buttons.map((btn) => (
                   <button
                     key={btn.value}
