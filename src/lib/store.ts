@@ -46,6 +46,7 @@ interface AppState {
   setCampaignStats: (stats: CampaignStats | null) => void;
 
   campaignAnswers: Partial<CampaignAnswers>;
+  setCampaignAnswers: (answers: Partial<CampaignAnswers>) => void;
   setCampaignAnswer: (key: keyof CampaignAnswers, value: string) => void;
   clearCampaignAnswers: () => void;
 
@@ -100,6 +101,7 @@ export const useAppStore = create<AppState>()(
       setCampaignStats: (stats) => set({ campaignStats: stats }),
 
       campaignAnswers: {},
+      setCampaignAnswers: (answers) => set({ campaignAnswers: answers }),
       setCampaignAnswer: (key, value) =>
         set((state) => ({
           campaignAnswers: { ...state.campaignAnswers, [key]: value },

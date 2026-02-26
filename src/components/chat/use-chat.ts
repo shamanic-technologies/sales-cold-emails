@@ -137,6 +137,7 @@ export function useChat() {
   const setCampaignId = useAppStore((s) => s.setCampaignId);
   const setCampaignStats = useAppStore((s) => s.setCampaignStats);
   const campaignAnswers = useAppStore((s) => s.campaignAnswers);
+  const setCampaignAnswers = useAppStore((s) => s.setCampaignAnswers);
   const chatSessionId = useAppStore((s) => s.chatSessionId);
   const setChatSessionId = useAppStore((s) => s.setChatSessionId);
 
@@ -222,6 +223,7 @@ export function useChat() {
         const answers = extractCampaignAnswers(accumulated);
         if (answers) {
           answersRef.current = answers;
+          setCampaignAnswers(answers);
 
           // If workflow is also ready, transition to proposed
           if (!workflowLoadingRef.current && workflowRef.current) {
@@ -249,7 +251,7 @@ export function useChat() {
         streamingRef.current = false;
       }
     },
-    [chatSessionId, addMessage, setChatSessionId]
+    [chatSessionId, addMessage, setChatSessionId, setCampaignAnswers]
   );
 
   // --- Launch campaign (preserved from original) ---
@@ -262,18 +264,32 @@ export function useChat() {
       timestamp: Date.now(),
     });
 
-    const answers = answersRef.current;
+    let answers = answersRef.current;
     if (!answers) {
-      addMessage({
-        id: crypto.randomUUID(),
-        role: "system",
-        content:
-          "I need a bit more info before we can launch. Let me ask you a few more questions.",
-        timestamp: Date.now(),
-      });
-      phaseRef.current = "chatting";
-      setApproved(false);
-      return;
+      // Fall back to store's partial answers with defaults
+      const stored = useAppStore.getState().campaignAnswers;
+      if (stored && Object.keys(stored).length > 0) {
+        answers = {
+          target_audience: stored.target_audience ?? "General audience",
+          value_for_target: stored.value_for_target ?? "Our product/service",
+          urgency: stored.urgency ?? "Limited time offer",
+          scarcity: stored.scarcity ?? "Limited availability",
+          risk_reversal: stored.risk_reversal ?? "Money-back guarantee",
+          social_proof: stored.social_proof ?? "Trusted by many companies",
+        };
+        answersRef.current = answers;
+      } else {
+        // No answers at all — use defaults based on onboarding input
+        answers = {
+          target_audience: "Decision makers at target companies",
+          value_for_target: `What ${extractDomain(onboardingInput!.brandUrl)} offers`,
+          urgency: "Limited time offer",
+          scarcity: "Limited availability",
+          risk_reversal: "No risk to try",
+          social_proof: "Trusted by growing companies",
+        };
+        answersRef.current = answers;
+      }
     }
 
     const brandDomain = extractDomain(onboardingInput!.brandUrl);
@@ -468,8 +484,30 @@ export function useChat() {
 
       const phase = phaseRef.current;
 
-      // Handle approval
-      if (phase === "proposed" && isApprovalMessage(content)) {
+      // Handle approval — allow in both "proposed" and "chatting" phases
+      // In "chatting" phase, the LLM may have collected answers without the
+      // structured campaign_answers block, so we launch if the workflow is ready
+      if (
+        (phase === "proposed" || phase === "chatting") &&
+        isApprovalMessage(content) &&
+        workflowRef.current &&
+        !workflowLoadingRef.current
+      ) {
+        // Build answers from ref or fall back to store
+        if (!answersRef.current) {
+          const stored = useAppStore.getState().campaignAnswers;
+          if (stored && Object.keys(stored).length > 0) {
+            answersRef.current = {
+              target_audience: stored.target_audience ?? "General audience",
+              value_for_target: stored.value_for_target ?? "Our product/service",
+              urgency: stored.urgency ?? "Limited time offer",
+              scarcity: stored.scarcity ?? "Limited availability",
+              risk_reversal: stored.risk_reversal ?? "Money-back guarantee",
+              social_proof: stored.social_proof ?? "Trusted by many companies",
+            };
+          }
+        }
+
         setApproved(true);
         setDashboardView("results");
         phaseRef.current = "running";
