@@ -45,6 +45,11 @@ describe("instrumentation", () => {
       expect(content).toContain('"stripe-webhook"');
     });
 
+    it("should read Stripe key from STRIPE_API_KEY env var", () => {
+      expect(content).toContain("process.env.STRIPE_API_KEY");
+      expect(content).not.toContain("process.env.STRIPE_SECRET_KEY");
+    });
+
     it("should use KEY_SERVICE_URL and KEY_SERVICE_API_KEY", () => {
       expect(content).toContain("KEY_SERVICE_URL");
       expect(content).toContain("KEY_SERVICE_API_KEY");
