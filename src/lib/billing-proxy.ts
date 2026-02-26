@@ -13,6 +13,14 @@ async function getOrgId(): Promise<string | null> {
   return cookieStore.get("mcpf_org_id")?.value ?? null;
 }
 
+/** Call GET /v1/accounts which auto-creates the billing account if it doesn't exist. */
+export async function ensureBillingAccount(): Promise<void> {
+  const resp = await proxyToBilling("/v1/accounts");
+  if (!resp.ok && resp.status !== 401) {
+    console.warn("ensureBillingAccount failed:", resp.status);
+  }
+}
+
 export async function proxyToBilling(
   path: string,
   options?: { method?: string; body?: unknown }
