@@ -24,6 +24,11 @@ describe("billing proxy", () => {
     expect(src).not.toContain("x-user-id");
   });
 
+  it("should export ensureBillingAccount that calls GET /v1/accounts", () => {
+    expect(src).toContain("ensureBillingAccount");
+    expect(src).toContain("/v1/accounts");
+  });
+
   it("should return 401 when orgId is missing", () => {
     expect(src).toContain("401");
     expect(src).toContain("Not provisioned");
@@ -36,6 +41,11 @@ describe("billing route handlers", () => {
     expect(src).toContain("isBillingMockMode");
     expect(src).toContain("balance_cents");
     expect(src).toContain("/v1/accounts/balance");
+  });
+
+  it("balance route should ensure billing account exists before fetching balance", () => {
+    const src = read("../src/app/api/billing/balance/route.ts");
+    expect(src).toContain("ensureBillingAccount");
   });
 
   it("checkout route should proxy POST to /v1/checkout-sessions", () => {

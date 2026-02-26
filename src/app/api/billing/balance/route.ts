@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isBillingMockMode, proxyToBilling } from "@/lib/billing-proxy";
+import { isBillingMockMode, proxyToBilling, ensureBillingAccount } from "@/lib/billing-proxy";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +11,9 @@ export async function GET() {
       depleted: false,
     });
   }
+
+  // Ensure billing account exists (auto-creates on first call)
+  await ensureBillingAccount();
 
   const upstream = await proxyToBilling("/v1/accounts/balance");
   const data = await upstream.json();
