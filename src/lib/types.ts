@@ -171,3 +171,22 @@ export interface CampaignAnswers {
   risk_reversal: string;
   social_proof: string;
 }
+
+// --- Billing Types ---
+
+export interface BillingBalance {
+  balance_cents: number;
+  billing_mode: string;
+  depleted: boolean;
+}
+
+export interface BillingTransaction {
+  amount: number;
+  description: string;
+  timestamp: string;
+}
+
+export interface CheckoutSessionResponse {
+  url: string;
+  session_id: string;
+}
