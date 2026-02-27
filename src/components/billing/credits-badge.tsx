@@ -29,7 +29,7 @@ export function CreditsBadge() {
       className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition ${
         depleted
           ? "bg-red-100 text-red-700 hover:bg-red-200"
-          : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+          : "bg-orange-50 text-orange-700 hover:bg-orange-100"
       }`}
       title="View billing"
     >

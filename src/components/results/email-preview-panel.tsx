@@ -17,7 +17,7 @@ export function EmailPreviewPanel() {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
         <div className="flex items-center gap-2">
-          <Mail className="h-4 w-4 text-indigo-600" />
+          <Mail className="h-4 w-4 text-orange-600" />
           <span className="text-sm font-medium text-gray-900">
             Email Preview
           </span>

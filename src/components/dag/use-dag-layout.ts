@@ -49,7 +49,7 @@ export function useDagLayout(dag: WorkflowDag | null) {
       source: edge.source,
       target: edge.target,
       animated: true,
-      style: { stroke: "#a5b4fc", strokeWidth: 2 },
+      style: { stroke: "#fdba74", strokeWidth: 2 },
     }));
 
     return { nodes, edges };

@@ -43,7 +43,7 @@ export function ProgressStats() {
       label: "Replied",
       value: replied,
       icon: MessageSquare,
-      color: "bg-indigo-100 text-indigo-600",
+      color: "bg-orange-100 text-orange-600",
     },
   ];
 

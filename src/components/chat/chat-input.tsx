@@ -48,12 +48,12 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder={disabled ? "AI is thinking..." : "Type a message..."}
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-200 disabled:bg-gray-50 disabled:text-gray-400"
+          className="flex-1 resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-200 disabled:bg-gray-50 disabled:text-gray-400"
         />
         <button
           onClick={handleSend}
           disabled={!value.trim() || disabled}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white transition hover:bg-indigo-700 disabled:opacity-40"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-600 text-white transition hover:bg-orange-700 disabled:opacity-40"
         >
           <Send className="h-4 w-4" />
         </button>

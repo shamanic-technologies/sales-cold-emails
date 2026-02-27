@@ -25,7 +25,7 @@ export function WorkflowDag() {
     }
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-gray-400">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-indigo-600" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-orange-600" />
         Loading your workflow...
       </div>
     );
@@ -45,7 +45,7 @@ export function WorkflowDag() {
         <Background gap={20} size={1} color="#e2e8f0" />
         <Controls showInteractive={false} />
         <MiniMap
-          nodeColor="#c7d2fe"
+          nodeColor="#fed7aa"
           maskColor="rgba(255,255,255,0.7)"
           className="!rounded-lg !border !border-gray-200"
         />

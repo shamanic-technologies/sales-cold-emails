@@ -148,7 +148,7 @@ export function HeroForm() {
                       setForm((f) => ({ ...f, brandUrl: e.target.value }))
                     }
                     placeholder="yourcompany.com"
-                    className="w-full rounded-xl border border-gray-200 py-3 pl-12 pr-5 text-base outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 sm:py-4 sm:text-lg"
+                    className="w-full rounded-xl border border-gray-200 py-3 pl-12 pr-5 text-base outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-200 sm:py-4 sm:text-lg"
                   />
                 </div>
                 <p className="text-sm text-gray-500">
@@ -170,7 +170,7 @@ export function HeroForm() {
                       onClick={() => handleObjectiveSelect(obj.value)}
                       className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition ${
                         form.objective === obj.value
-                          ? "border-indigo-600 bg-indigo-50"
+                          ? "border-orange-600 bg-orange-50"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
@@ -202,7 +202,7 @@ export function HeroForm() {
                       setForm((f) => ({ ...f, objectiveUrl: e.target.value }))
                     }
                     placeholder="yourcompany.com/landing-page"
-                    className="w-full rounded-xl border border-gray-200 py-3 pl-12 pr-5 text-base outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 sm:py-4 sm:text-lg"
+                    className="w-full rounded-xl border border-gray-200 py-3 pl-12 pr-5 text-base outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-200 sm:py-4 sm:text-lg"
                   />
                 </div>
                 <p className="text-sm text-gray-500">
@@ -225,7 +225,7 @@ export function HeroForm() {
                       setForm((f) => ({ ...f, budgetAmount: e.target.value }))
                     }
                     placeholder="Amount ($)"
-                    className="w-full rounded-xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 sm:flex-1 sm:text-lg"
+                    className="w-full rounded-xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-200 sm:flex-1 sm:text-lg"
                   />
                   <div className="grid grid-cols-2 gap-2">
                     {BUDGET_TYPES.map((bt) => (
@@ -237,7 +237,7 @@ export function HeroForm() {
                         }
                         className={`rounded-lg border-2 px-3 py-2 text-sm font-medium transition ${
                           form.budgetType === bt.value
-                            ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                            ? "border-orange-600 bg-orange-50 text-orange-700"
                             : "border-gray-200 text-gray-600 hover:border-gray-300"
                         }`}
                       >
@@ -258,7 +258,7 @@ export function HeroForm() {
               <div
                 key={i}
                 className={`h-2 w-2 rounded-full transition ${
-                  i <= stepIndex ? "bg-indigo-600" : "bg-gray-200"
+                  i <= stepIndex ? "bg-orange-600" : "bg-gray-200"
                 }`}
               />
             ))}
@@ -277,7 +277,7 @@ export function HeroForm() {
             <button
               type="submit"
               disabled={!canAdvance() || submitting}
-              className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-orange-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-orange-700 disabled:opacity-50"
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

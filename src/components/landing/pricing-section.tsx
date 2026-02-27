@@ -52,12 +52,12 @@ export function PricingSection() {
               key={plan.name}
               className={`relative flex flex-col rounded-2xl border-2 p-5 text-left transition sm:p-6 md:p-8 ${
                 plan.highlighted
-                  ? "border-indigo-600 shadow-lg shadow-indigo-100"
+                  ? "border-orange-600 shadow-lg shadow-orange-100"
                   : "border-gray-200"
               }`}
             >
               {plan.highlighted && (
-                <span className="absolute -top-3 left-6 rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white">
+                <span className="absolute -top-3 left-6 rounded-full bg-orange-600 px-3 py-1 text-xs font-semibold text-white">
                   Popular
                 </span>
               )}
@@ -66,7 +66,7 @@ export function PricingSection() {
                 <div
                   className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                     plan.highlighted
-                      ? "bg-indigo-100 text-indigo-600"
+                      ? "bg-orange-100 text-orange-600"
                       : "bg-gray-100 text-gray-600"
                   }`}
                 >
@@ -100,7 +100,7 @@ export function PricingSection() {
                 href="/sign-up"
                 className={`mt-8 block rounded-lg py-3 text-center text-sm font-medium transition ${
                   plan.highlighted
-                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                    ? "bg-orange-600 text-white hover:bg-orange-700"
                     : "border border-gray-200 text-gray-700 hover:bg-gray-50"
                 }`}
               >
