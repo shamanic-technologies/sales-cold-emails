@@ -1,24 +1,15 @@
-import { cookies } from "next/headers";
+import { auth } from "@clerk/nextjs/server";
 
 const API_SERVICE_URL = process.env.API_SERVICE_URL;
+const MCPF_APP_KEY = process.env.MCPF_APP_KEY;
 
 export function isMockMode(): boolean {
-  return !API_SERVICE_URL;
+  return !API_SERVICE_URL || !MCPF_APP_KEY;
 }
 
-async function getApiKey(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get("mcpf_api_key")?.value ?? null;
-}
-
-export async function getOrgId(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get("mcpf_org_id")?.value ?? null;
-}
-
-export async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get("mcpf_user_id")?.value ?? null;
+export async function getClerkIds(): Promise<{ orgId: string | null; userId: string | null }> {
+  const session = await auth();
+  return { orgId: session.orgId ?? null, userId: session.userId ?? null };
 }
 
 async function getHeaders(extra?: Record<string, string>): Promise<Record<string, string>> {
@@ -26,18 +17,19 @@ async function getHeaders(extra?: Record<string, string>): Promise<Record<string
     "Content-Type": "application/json",
     ...extra,
   };
-  const apiKey = await getApiKey();
-  if (apiKey) {
-    headers["X-API-Key"] = apiKey;
+
+  if (MCPF_APP_KEY) {
+    headers["Authorization"] = `Bearer ${MCPF_APP_KEY}`;
   }
-  const orgId = await getOrgId();
+
+  const { orgId, userId } = await getClerkIds();
   if (orgId) {
     headers["x-org-id"] = orgId;
   }
-  const userId = await getUserId();
   if (userId) {
     headers["x-user-id"] = userId;
   }
+
   return headers;
 }
 

@@ -1,26 +1,11 @@
-import { cookies } from "next/headers";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { ProvisionGuard } from "@/components/dashboard/provision-guard";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const hasApiKey = !!cookieStore.get("mcpf_api_key")?.value;
-  const hasOrgId = !!cookieStore.get("mcpf_org_id")?.value;
-  const isProvisioned = hasApiKey && hasOrgId;
-
-  if (isProvisioned) {
-    return <DashboardShell>{children}</DashboardShell>;
-  }
-
-  return (
-    <ProvisionGuard>
-      <DashboardShell>{children}</DashboardShell>
-    </ProvisionGuard>
-  );
+  return <DashboardShell>{children}</DashboardShell>;
 }

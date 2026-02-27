@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { isDbMockMode, getDb } from "@/lib/db";
 import { campaignSetups } from "@/lib/db/schema";
-import { getOrgId, getUserId } from "@/lib/api-proxy";
+import { getClerkIds } from "@/lib/api-proxy";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +11,10 @@ export async function GET() {
     return NextResponse.json(null);
   }
 
-  const orgId = await getOrgId();
+  const { orgId } = await getClerkIds();
   if (!orgId) {
     return NextResponse.json(
-      { error: "Not provisioned. Missing org identity." },
+      { error: "Missing org identity. Ensure Clerk org is active." },
       { status: 401 }
     );
   }
@@ -34,11 +34,10 @@ export async function PUT(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  const orgId = await getOrgId();
-  const userId = await getUserId();
+  const { orgId, userId } = await getClerkIds();
   if (!orgId || !userId) {
     return NextResponse.json(
-      { error: "Not provisioned. Missing identity." },
+      { error: "Missing identity. Ensure Clerk session is active." },
       { status: 401 }
     );
   }

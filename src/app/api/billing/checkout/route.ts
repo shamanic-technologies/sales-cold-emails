@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isBillingMockMode, proxyToBilling } from "@/lib/billing-proxy";
+import { isMockMode, proxyToApi } from "@/lib/api-proxy";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  if (isBillingMockMode()) {
+  if (isMockMode()) {
     return NextResponse.json({
       url: "https://checkout.stripe.com/mock-session",
       session_id: `mock_cs_${crypto.randomUUID()}`,
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const upstream = await proxyToBilling("/v1/checkout-sessions", {
+  const upstream = await proxyToApi("/v1/billing/checkout-sessions", {
     method: "POST",
     body,
   });
