@@ -56,6 +56,16 @@ export default function LandingPage() {
             pay-as-you-go with zero markup.
           </p>
           <HeroForm />
+          <div className="mt-10">
+            <Image
+              src="/hero-banner.jpg"
+              alt="Sales Cold Emails — AI-powered cold email campaigns"
+              width={800}
+              height={400}
+              className="mx-auto rounded-2xl shadow-lg"
+              priority
+            />
+          </div>
         </div>
       </section>
 
