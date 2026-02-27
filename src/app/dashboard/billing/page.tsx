@@ -80,8 +80,8 @@ export default function BillingPage() {
       {balance && (
         <div className="mt-6 rounded-xl border border-gray-200 p-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100">
-              <Coins className="h-5 w-5 text-indigo-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100">
+              <Coins className="h-5 w-5 text-orange-600" />
             </div>
             <div>
               <p className="text-sm text-gray-500">Current Balance</p>
@@ -113,7 +113,7 @@ export default function BillingPage() {
               key={cents}
               onClick={() => handleAddCredits(cents)}
               disabled={checkoutLoading !== null}
-              className="flex flex-col items-center rounded-lg border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-indigo-300 hover:bg-indigo-50 disabled:opacity-50"
+              className="flex flex-col items-center rounded-lg border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-orange-300 hover:bg-orange-50 disabled:opacity-50"
             >
               <span className="text-lg font-bold">${cents / 100}</span>
               {checkoutLoading === cents && (

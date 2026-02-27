@@ -60,7 +60,7 @@ export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
                   msg.role === "user"
-                    ? "bg-indigo-600 text-white"
+                    ? "bg-orange-600 text-white"
                     : "bg-gray-100 text-gray-800"
                 }`}
               >
@@ -77,15 +77,15 @@ export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
             {/* Suggestion block */}
             {msg.suggestion && (
               <div className="ml-11 mt-2 mr-2">
-                <div className="rounded-xl border border-violet-200 bg-violet-50/50 px-4 py-3">
-                  <p className="mb-2 text-xs font-medium text-violet-500">
+                <div className="rounded-xl border border-teal-200 bg-teal-50/50 px-4 py-3">
+                  <p className="mb-2 text-xs font-medium text-teal-500">
                     Suggested answer
                   </p>
                   <p className="text-sm text-gray-700">{msg.suggestion}</p>
                   {isSuggestionActive(idx) && onUseSuggestion && (
                     <button
                       onClick={() => onUseSuggestion(msg.suggestion!)}
-                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700"
+                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-orange-700"
                     >
                       Use this
                       <ArrowRight className="h-3 w-3" />
@@ -102,7 +102,7 @@ export function ChatMessages({ messages, onUseSuggestion }: ChatMessagesProps) {
                   <button
                     key={btn.value}
                     onClick={() => onUseSuggestion?.(btn.value)}
-                    className="rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-medium text-indigo-600 transition hover:bg-indigo-50"
+                    className="rounded-lg border border-orange-200 bg-white px-3 py-1.5 text-xs font-medium text-orange-600 transition hover:bg-orange-50"
                   >
                     {btn.label}
                   </button>

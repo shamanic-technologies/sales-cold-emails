@@ -36,7 +36,7 @@ export default function LandingPage() {
           </div>
           <a
             href="/sign-in"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+            className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-700"
           >
             Sign In
           </a>
@@ -78,7 +78,7 @@ export default function LandingPage() {
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {FEATURES.map((f) => (
               <div key={f.title} className="text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
                   <f.icon className="h-6 w-6" />
                 </div>
                 <h3 className="mt-4 text-lg font-semibold text-gray-900">

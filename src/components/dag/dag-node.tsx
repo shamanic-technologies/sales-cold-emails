@@ -15,14 +15,14 @@ const ICONS: Record<DagNodeType, typeof Search> = {
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "border-gray-200 bg-white",
-  active: "border-indigo-400 bg-indigo-50 shadow-md shadow-indigo-100",
+  active: "border-orange-400 bg-orange-50 shadow-md shadow-orange-100",
   completed: "border-emerald-400 bg-emerald-50",
   error: "border-red-400 bg-red-50",
 };
 
 const STATUS_BADGES: Record<string, { label: string; color: string }> = {
   pending: { label: "Pending", color: "bg-gray-100 text-gray-600" },
-  active: { label: "Active", color: "bg-indigo-100 text-indigo-700" },
+  active: { label: "Active", color: "bg-orange-100 text-orange-700" },
   completed: { label: "Done", color: "bg-emerald-100 text-emerald-700" },
   error: { label: "Error", color: "bg-red-100 text-red-700" },
 };
@@ -47,7 +47,7 @@ function DagStepNodeComponent({ data }: NodeProps<DagStepData>) {
       <Handle type="target" position={Position.Top} className="!bg-gray-300" />
 
       <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-orange-600">
           <Icon className="h-4 w-4" />
         </div>
         <div className="flex-1">

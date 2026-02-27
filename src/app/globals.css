@@ -6,7 +6,7 @@
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
   --border: #e2e8f0;
-  --primary: #4f46e5;
+  --primary: #ea580c;
   --primary-foreground: #ffffff;
   --accent: #10b981;
   --accent-foreground: #ffffff;
@@ -37,11 +37,11 @@ body {
 }
 
 .gradient-hero {
-  background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 30%, #c7d2fe 55%, #ddd6fe 80%, #ede9fe 100%);
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 30%, #fed7aa 55%, #fde68a 80%, #ccfbf1 100%);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 40%, #7c3aed 100%);
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 40%, #b45309 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

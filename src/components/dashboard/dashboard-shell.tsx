@@ -33,7 +33,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               onClick={() => setMobileTab("chat")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition ${
                 mobileTab === "chat"
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-orange-600 text-white"
                   : "text-gray-600 hover:bg-gray-100"
               }`}
             >
@@ -44,7 +44,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               onClick={() => setMobileTab("results")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition ${
                 mobileTab === "results"
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-orange-600 text-white"
                   : "text-gray-600 hover:bg-gray-100"
               }`}
             >

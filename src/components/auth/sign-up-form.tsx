@@ -20,7 +20,7 @@ export function SignUpForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl sm:p-8">
         <div className="mb-6 flex flex-col items-center gap-3">
           <Image src="/logo.jpg" alt="Sales Cold Emails" width={48} height={48} className="h-12 w-12 rounded-xl" />
@@ -66,7 +66,7 @@ export function SignUpForm() {
           Already have an account?{" "}
           <a
             href="/sign-in"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="font-medium text-orange-600 hover:text-orange-500"
           >
             Sign in
           </a>

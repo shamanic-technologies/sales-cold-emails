@@ -20,7 +20,7 @@ const STATUS_CONFIG: Record<
   sending: { label: "Sending", color: "bg-yellow-100 text-yellow-700" },
   sent: { label: "Sent", color: "bg-emerald-100 text-emerald-700" },
   opened: { label: "Opened", color: "bg-amber-100 text-amber-700" },
-  replied: { label: "Replied", color: "bg-indigo-100 text-indigo-700" },
+  replied: { label: "Replied", color: "bg-orange-100 text-orange-700" },
 };
 
 interface ResultsRowProps {
@@ -43,7 +43,7 @@ export function ResultsRowComponent({
       transition={{ duration: 0.3 }}
       onClick={onClick}
       className={`cursor-pointer border-b border-gray-100 transition hover:bg-gray-50 ${
-        isSelected ? "bg-indigo-50" : ""
+        isSelected ? "bg-orange-50" : ""
       }`}
     >
       <td className="px-4 py-3">
