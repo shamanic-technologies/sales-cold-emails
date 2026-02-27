@@ -37,10 +37,10 @@ describe("best workflow integration", () => {
     expect(apiClientContent).toContain("objective");
   });
 
-  it("should have a proxy route for /api/workflows/best", () => {
+  it("should have a proxy route for /api/workflows/best without appId filter", () => {
     expect(routeContent).toContain("export async function GET");
     expect(routeContent).toContain("/v1/workflows/best");
-    expect(routeContent).toContain('appId: "sales-cold-emails"');
+    expect(routeContent).not.toContain("appId");
   });
 
   it("should have mock mode support in the best workflow route", () => {

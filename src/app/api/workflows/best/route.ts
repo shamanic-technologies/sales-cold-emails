@@ -40,7 +40,6 @@ export async function GET(req: NextRequest) {
   }
 
   const params = new URLSearchParams({
-    appId: "sales-cold-emails",
     category,
     channel,
     audienceType,
