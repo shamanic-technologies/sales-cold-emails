@@ -45,12 +45,13 @@ describe("chat route handler", () => {
     expect(content).toContain('"sales-cold-emails"');
   });
 
-  it("should lazily register app config via ensureAppConfigRegistered", () => {
+  it("should lazily register app config with Clerk IDs", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/app/api/chat/route.ts"),
       "utf-8"
     );
     expect(content).toContain("ensureAppConfigRegistered");
+    expect(content).toContain("getClerkIds");
     expect(content).toContain("@/instrumentation");
   });
 });

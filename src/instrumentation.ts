@@ -56,7 +56,7 @@ Follow this JSON block with a message like: "I have everything I need! The workf
 
 let configRegistered = false;
 
-export async function ensureAppConfigRegistered(): Promise<void> {
+export async function ensureAppConfigRegistered(clerkIds?: { orgId: string | null; userId: string | null }): Promise<void> {
   if (configRegistered) return;
   if (!API_SERVICE_URL || !MCPF_APP_KEY) {
     console.log("[instrumentation] API_SERVICE not configured, skipping chat config registration");
@@ -64,12 +64,16 @@ export async function ensureAppConfigRegistered(): Promise<void> {
   }
 
   try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${MCPF_APP_KEY}`,
+    };
+    if (clerkIds?.orgId) headers["x-org-id"] = clerkIds.orgId;
+    if (clerkIds?.userId) headers["x-user-id"] = clerkIds.userId;
+
     const res = await fetch(`${API_SERVICE_URL}/v1/chat/config`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${MCPF_APP_KEY}`,
-      },
+      headers,
       body: JSON.stringify({ appId: APP_ID, systemPrompt: SYSTEM_PROMPT }),
     });
 

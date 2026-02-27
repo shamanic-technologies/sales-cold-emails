@@ -21,6 +21,12 @@ describe("instrumentation", () => {
       expect(content).toContain("MCPF_APP_KEY");
     });
 
+    it("should forward Clerk IDs as x-org-id and x-user-id headers", () => {
+      expect(content).toContain("clerkIds");
+      expect(content).toContain('"x-org-id"');
+      expect(content).toContain('"x-user-id"');
+    });
+
     it("should cache registration with configRegistered flag", () => {
       expect(content).toContain("configRegistered");
     });

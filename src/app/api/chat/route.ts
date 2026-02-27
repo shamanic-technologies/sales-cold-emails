@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { isMockMode, proxyToApi } from "@/lib/api-proxy";
+import { isMockMode, proxyToApi, getClerkIds } from "@/lib/api-proxy";
 import { ensureAppConfigRegistered } from "@/instrumentation";
 
 export const dynamic = "force-dynamic";
@@ -70,8 +70,9 @@ export async function POST(req: NextRequest) {
     return mockChatResponse(message, sessionId);
   }
 
-  // Lazily register chat config on first request
-  await ensureAppConfigRegistered();
+  // Lazily register chat config on first request (pass Clerk IDs for backend org context)
+  const clerkIds = await getClerkIds();
+  await ensureAppConfigRegistered(clerkIds);
 
   const upstream = await proxyToApi("/v1/chat", {
     method: "POST",
