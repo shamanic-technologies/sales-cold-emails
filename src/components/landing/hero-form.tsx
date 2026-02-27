@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Loader2, Globe, Link2 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { saveSetup } from "@/lib/api-client";
 import type { OnboardingInput } from "@/lib/types";
 
 const OBJECTIVES = [
@@ -105,6 +106,14 @@ export function HeroForm() {
       pricingTier: "pay-as-you-go",
     };
     setOnboardingInput(input);
+    saveSetup({
+      brandUrl: input.brandUrl,
+      objective: input.objective,
+      objectiveUrl: input.objectiveUrl ?? null,
+      budgetType: input.budgetType,
+      budgetAmount: input.budgetAmount,
+      pricingTier: input.pricingTier,
+    });
 
     if (isSignedIn) {
       router.push("/dashboard");
