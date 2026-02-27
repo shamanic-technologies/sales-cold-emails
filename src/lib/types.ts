@@ -72,7 +72,9 @@ export interface ResultRow {
   timestamp: number;
 }
 
-export type DashboardView = "dag" | "results";
+export type DashboardView = "workflow" | "results";
+
+export type CampaignStatus = "ready" | "launching" | "running" | "completed" | "failed";
 
 // --- API Types ---
 

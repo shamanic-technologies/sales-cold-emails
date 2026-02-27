@@ -534,7 +534,7 @@ export function useChat() {
       });
       phaseRef.current = "proposed";
       setApproved(false);
-      setDashboardView("dag");
+      setDashboardView("workflow");
     }
   }, [
     onboardingInput,

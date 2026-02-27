@@ -6,14 +6,41 @@ import type {
   WorkflowDag,
   ResultRow,
   DashboardView,
+  CampaignStatus,
   GenerateWorkflowResponse,
   BestWorkflowResponse,
   CampaignStats,
   CampaignAnswers,
+  CreateCampaignRequest,
 } from "./types";
+import { createCampaign, connectCampaignStream, saveSetup } from "./api-client";
 import type { CampaignSetup } from "./api-client";
 
 type WorkflowResponseData = GenerateWorkflowResponse | BestWorkflowResponse;
+
+function buildSetupPayload(): CampaignSetup {
+  const s = useAppStore.getState();
+  return {
+    brandUrl: s.onboardingInput?.brandUrl ?? null,
+    objective: s.onboardingInput?.objective ?? null,
+    objectiveUrl: s.onboardingInput?.objectiveUrl ?? null,
+    budgetType: s.onboardingInput?.budgetType ?? null,
+    budgetAmount: s.onboardingInput?.budgetAmount ?? null,
+    pricingTier: s.onboardingInput?.pricingTier ?? null,
+    targetAudience: s.campaignAnswers.target_audience ?? null,
+    valueForTarget: s.campaignAnswers.value_for_target ?? null,
+    urgency: s.campaignAnswers.urgency ?? null,
+    scarcity: s.campaignAnswers.scarcity ?? null,
+    riskReversal: s.campaignAnswers.risk_reversal ?? null,
+    socialProof: s.campaignAnswers.social_proof ?? null,
+    chatSessionId: s.chatSessionId ?? null,
+    workflowId: s.workflowResponse?.workflow.id ?? null,
+    workflowName: s.workflowResponse?.workflow.name ?? null,
+    campaignId: s.campaignId ?? null,
+    isApproved: s.isApproved,
+    dashboardView: s.dashboardView,
+  };
+}
 
 interface AppState {
   onboardingInput: OnboardingInput | null;
@@ -60,6 +87,13 @@ interface AppState {
   chatSessionId: string | null;
   setChatSessionId: (id: string | null) => void;
 
+  campaignStatus: CampaignStatus;
+  setCampaignStatus: (status: CampaignStatus) => void;
+
+  setOnboardingBudget: (budgetType: OnboardingInput["budgetType"], budgetAmount: number) => void;
+
+  launchCampaignFromPicker: () => Promise<void>;
+
   updateMessage: (id: string, content: string) => void;
   updateMessageButtons: (id: string, buttons: Array<{ label: string; value: string }>) => void;
 
@@ -91,7 +125,7 @@ export const useAppStore = create<AppState>()(
         })),
       clearResults: () => set({ results: [] }),
 
-      dashboardView: "dag",
+      dashboardView: "workflow",
       setDashboardView: (view) => set({ dashboardView: view }),
 
       selectedResultId: null,
@@ -122,6 +156,118 @@ export const useAppStore = create<AppState>()(
 
       chatSessionId: null,
       setChatSessionId: (id) => set({ chatSessionId: id }),
+
+      campaignStatus: "ready",
+      setCampaignStatus: (status) => set({ campaignStatus: status }),
+
+      setOnboardingBudget: (budgetType, budgetAmount) =>
+        set((state) => ({
+          onboardingInput: state.onboardingInput
+            ? { ...state.onboardingInput, budgetType, budgetAmount }
+            : null,
+        })),
+
+      launchCampaignFromPicker: async () => {
+        const state = useAppStore.getState();
+        const { onboardingInput, campaignAnswers, workflowResponse } = state;
+        if (!onboardingInput || !workflowResponse) return;
+
+        set({ campaignStatus: "launching" });
+
+        const answers: CampaignAnswers = {
+          target_audience: campaignAnswers.target_audience ?? "Decision makers at target companies",
+          value_for_target: campaignAnswers.value_for_target ?? "Our product/service",
+          urgency: campaignAnswers.urgency ?? "Limited time offer",
+          scarcity: campaignAnswers.scarcity ?? "Limited availability",
+          risk_reversal: campaignAnswers.risk_reversal ?? "No risk to try",
+          social_proof: campaignAnswers.social_proof ?? "Trusted by growing companies",
+        };
+
+        const budgetFields: Record<string, number> = {};
+        switch (onboardingInput.budgetType) {
+          case "one-off": budgetFields.maxBudgetTotalUsd = onboardingInput.budgetAmount; break;
+          case "daily": budgetFields.maxBudgetDailyUsd = onboardingInput.budgetAmount; break;
+          case "weekly": budgetFields.maxBudgetWeeklyUsd = onboardingInput.budgetAmount; break;
+          case "monthly": budgetFields.maxBudgetMonthlyUsd = onboardingInput.budgetAmount; break;
+        }
+
+        let brandDomain: string;
+        try { brandDomain = new URL(onboardingInput.brandUrl).hostname; } catch { brandDomain = onboardingInput.brandUrl; }
+
+        const objectiveLabel = onboardingInput.objective === "responses" ? "Maximize email replies" : "Drive link clicks";
+
+        const campaignRequest: CreateCampaignRequest = {
+          name: `Campaign for ${brandDomain}`,
+          workflowName: workflowResponse.workflow.name ?? "sales-email-cold-outreach-mock",
+          brandUrl: onboardingInput.brandUrl,
+          targetAudience: answers.target_audience,
+          targetOutcome: objectiveLabel,
+          valueForTarget: answers.value_for_target,
+          urgency: answers.urgency,
+          scarcity: answers.scarcity,
+          riskReversal: answers.risk_reversal,
+          socialProof: answers.social_proof,
+          ...budgetFields,
+        };
+
+        try {
+          const campaign = await createCampaign(campaignRequest);
+          set({
+            campaignId: campaign.id,
+            campaignStatus: "running",
+            isApproved: true,
+            dashboardView: "results",
+          });
+
+          const setupPayload = buildSetupPayload();
+          saveSetup(setupPayload);
+
+          const es = connectCampaignStream(campaign.id);
+
+          es.onmessage = (event) => {
+            try {
+              const parsed = JSON.parse(event.data);
+              const s = useAppStore.getState();
+              switch (parsed.type) {
+                case "lead":
+                  s.addResult({
+                    id: parsed.data.id,
+                    companyName: parsed.data.companyName ?? parsed.data.company_name ?? "",
+                    personName: parsed.data.personName ?? parsed.data.person_name ?? "",
+                    personTitle: parsed.data.personTitle ?? parsed.data.person_title ?? "",
+                    email: parsed.data.email ?? "",
+                    status: parsed.data.status ?? "queued",
+                    emailSubject: parsed.data.emailSubject ?? parsed.data.email_subject,
+                    emailBody: parsed.data.emailBody ?? parsed.data.email_body,
+                    timestamp: parsed.data.timestamp ?? Date.now(),
+                  });
+                  break;
+                case "lead_update":
+                  s.updateResult(parsed.data.id, {
+                    status: parsed.data.status,
+                    ...(parsed.data.emailSubject ? { emailSubject: parsed.data.emailSubject } : {}),
+                    ...(parsed.data.emailBody ? { emailBody: parsed.data.emailBody } : {}),
+                  });
+                  break;
+                case "stats":
+                  s.setCampaignStats(parsed.data);
+                  break;
+                case "done":
+                  es.close();
+                  useAppStore.setState({ campaignStatus: "completed" });
+                  break;
+              }
+            } catch { /* skip malformed events */ }
+          };
+
+          es.onerror = () => {
+            es.close();
+            useAppStore.setState({ campaignStatus: "failed" });
+          };
+        } catch {
+          set({ campaignStatus: "failed" });
+        }
+      },
 
       updateMessage: (id, content) =>
         set((state) => ({
@@ -172,7 +318,7 @@ export const useAppStore = create<AppState>()(
           if (!state.isApproved && setup.isApproved) {
             updates.isApproved = true;
           }
-          if (state.dashboardView === "dag" && setup.dashboardView && setup.dashboardView !== "dag") {
+          if (state.dashboardView === "workflow" && setup.dashboardView && setup.dashboardView !== "workflow") {
             updates.dashboardView = setup.dashboardView as DashboardView;
           }
 
@@ -193,6 +339,7 @@ export const useAppStore = create<AppState>()(
         chatSessionId: state.chatSessionId,
         results: state.results,
         campaignStats: state.campaignStats,
+        campaignStatus: state.campaignStatus,
       }),
       merge: (persisted, current) => {
         const p = persisted as Partial<AppState> | undefined;

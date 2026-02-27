@@ -29,7 +29,7 @@ export const campaignSetups = pgTable("campaign_setups", {
 
   // Phase state
   isApproved: boolean("is_approved").default(false),
-  dashboardView: text("dashboard_view").default("dag"),
+  dashboardView: text("dashboard_view").default("workflow"),
 
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
