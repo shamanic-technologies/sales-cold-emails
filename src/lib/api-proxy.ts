@@ -30,6 +30,14 @@ async function getHeaders(extra?: Record<string, string>): Promise<Record<string
   if (apiKey) {
     headers["X-API-Key"] = apiKey;
   }
+  const orgId = await getOrgId();
+  if (orgId) {
+    headers["x-org-id"] = orgId;
+  }
+  const userId = await getUserId();
+  if (userId) {
+    headers["x-user-id"] = userId;
+  }
   return headers;
 }
 

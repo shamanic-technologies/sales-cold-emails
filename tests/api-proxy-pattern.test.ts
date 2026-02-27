@@ -43,6 +43,15 @@ describe("API proxy pattern", () => {
     expect(content).toContain("mcpf_org_id");
     expect(content).toContain("mcpf_user_id");
   });
+
+  it("should send x-org-id and x-user-id headers in getHeaders", () => {
+    const content = fs.readFileSync(
+      path.join(__dirname, "../src/lib/api-proxy.ts"),
+      "utf-8"
+    );
+    expect(content).toContain('"x-org-id"');
+    expect(content).toContain('"x-user-id"');
+  });
 });
 
 describe("Auth provision route", () => {
