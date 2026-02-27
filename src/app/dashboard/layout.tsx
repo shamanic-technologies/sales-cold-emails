@@ -14,9 +14,13 @@ export default async function DashboardLayout({
   const hasOrgId = !!cookieStore.get("mcpf_org_id")?.value;
   const isProvisioned = hasApiKey && hasOrgId;
 
+  if (isProvisioned) {
+    return <DashboardShell>{children}</DashboardShell>;
+  }
+
   return (
-    <DashboardShell>
-      {isProvisioned ? children : <ProvisionGuard>{children}</ProvisionGuard>}
-    </DashboardShell>
+    <ProvisionGuard>
+      <DashboardShell>{children}</DashboardShell>
+    </ProvisionGuard>
   );
 }
