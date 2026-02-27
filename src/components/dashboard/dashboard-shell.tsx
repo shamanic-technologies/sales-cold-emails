@@ -7,11 +7,13 @@ import Image from "next/image";
 import { MessageSquare, BarChart3 } from "lucide-react";
 import { ChatPanel } from "@/components/chat/chat-panel";
 import { CreditsBadge } from "@/components/billing/credits-badge";
+import { useSetupSync } from "@/lib/use-setup-sync";
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isSubpage = pathname !== "/dashboard";
   const [mobileTab, setMobileTab] = useState<"chat" | "results">("chat");
+  useSetupSync();
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-white">

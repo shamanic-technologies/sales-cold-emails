@@ -9,7 +9,9 @@ import {
   connectCampaignStream,
   scrapeBrand,
   sendChatMessage,
+  saveSetup,
 } from "@/lib/api-client";
+import type { CampaignSetup } from "@/lib/api-client";
 import { apiDagToWorkflowDag } from "@/lib/dag-transform";
 import type {
   CreateCampaignRequest,
@@ -131,6 +133,30 @@ function isApprovalMessage(content: string): boolean {
   );
 }
 
+function buildSetupPayload(): CampaignSetup {
+  const s = useAppStore.getState();
+  return {
+    brandUrl: s.onboardingInput?.brandUrl ?? null,
+    objective: s.onboardingInput?.objective ?? null,
+    objectiveUrl: s.onboardingInput?.objectiveUrl ?? null,
+    budgetType: s.onboardingInput?.budgetType ?? null,
+    budgetAmount: s.onboardingInput?.budgetAmount ?? null,
+    pricingTier: s.onboardingInput?.pricingTier ?? null,
+    targetAudience: s.campaignAnswers.target_audience ?? null,
+    valueForTarget: s.campaignAnswers.value_for_target ?? null,
+    urgency: s.campaignAnswers.urgency ?? null,
+    scarcity: s.campaignAnswers.scarcity ?? null,
+    riskReversal: s.campaignAnswers.risk_reversal ?? null,
+    socialProof: s.campaignAnswers.social_proof ?? null,
+    chatSessionId: s.chatSessionId ?? null,
+    workflowId: s.workflowResponse?.workflow.id ?? null,
+    workflowName: s.workflowResponse?.workflow.name ?? null,
+    campaignId: s.campaignId ?? null,
+    isApproved: s.isApproved,
+    dashboardView: s.dashboardView,
+  };
+}
+
 type Phase = "init" | "chatting" | "proposed" | "approved" | "running";
 
 export function useChat() {
@@ -183,6 +209,7 @@ export function useChat() {
         content: "Your workflow is ready! Take a look at the DAG on the right. Keep chatting below so I can fine-tune your campaign.",
         timestamp: Date.now(),
       });
+      saveSetup(buildSetupPayload());
     };
 
     getBestWorkflow(apiObjective)
@@ -255,6 +282,7 @@ export function useChat() {
         content: "Workflow updated! Check the DAG on the right.",
         timestamp: Date.now(),
       });
+      saveSetup(buildSetupPayload());
     } catch (err) {
       console.error("Workflow regeneration failed:", err);
       workflowLoadingRef.current = false;
@@ -298,6 +326,7 @@ export function useChat() {
           if ("sessionId" in event && typeof event.sessionId === "string") {
             if (!chatSessionId) {
               setChatSessionId(event.sessionId);
+              saveSetup(buildSetupPayload());
             }
             continue;
           }
@@ -331,6 +360,7 @@ export function useChat() {
         if (answers) {
           answersRef.current = answers;
           setCampaignAnswers(answers);
+          saveSetup(buildSetupPayload());
 
           // If workflow is also ready, transition to proposed
           if (!workflowLoadingRef.current && workflowRef.current) {
@@ -430,6 +460,7 @@ export function useChat() {
 
       const campaign = await createCampaign(campaignRequest);
       setCampaignId(campaign.id);
+      saveSetup(buildSetupPayload());
 
       // Connect to SSE stream
       const es = connectCampaignStream(campaign.id);

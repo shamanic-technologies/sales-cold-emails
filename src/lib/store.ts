@@ -11,6 +11,7 @@ import type {
   CampaignStats,
   CampaignAnswers,
 } from "./types";
+import type { CampaignSetup } from "./api-client";
 
 type WorkflowResponseData = GenerateWorkflowResponse | BestWorkflowResponse;
 
@@ -61,6 +62,8 @@ interface AppState {
 
   updateMessage: (id: string, content: string) => void;
   updateMessageButtons: (id: string, buttons: Array<{ label: string; value: string }>) => void;
+
+  hydrateFromServer: (setup: CampaignSetup) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -132,6 +135,49 @@ export const useAppStore = create<AppState>()(
             m.id === id ? { ...m, buttons } : m
           ),
         })),
+
+      hydrateFromServer: (setup) =>
+        set((state) => {
+          const updates: Partial<AppState> = {};
+
+          // Only fill missing local state — localStorage wins if it has data
+          if (!state.onboardingInput && setup.brandUrl) {
+            updates.onboardingInput = {
+              brandUrl: setup.brandUrl,
+              objective: (setup.objective as OnboardingInput["objective"]) ?? "responses",
+              objectiveUrl: setup.objectiveUrl ?? undefined,
+              budgetType: (setup.budgetType as OnboardingInput["budgetType"]) ?? "one-off",
+              budgetAmount: Number(setup.budgetAmount) || 0,
+              pricingTier: (setup.pricingTier as OnboardingInput["pricingTier"]) ?? "pay-as-you-go",
+            };
+          }
+
+          if (Object.keys(state.campaignAnswers).length === 0 && setup.targetAudience) {
+            updates.campaignAnswers = {
+              target_audience: setup.targetAudience ?? undefined,
+              value_for_target: setup.valueForTarget ?? undefined,
+              urgency: setup.urgency ?? undefined,
+              scarcity: setup.scarcity ?? undefined,
+              risk_reversal: setup.riskReversal ?? undefined,
+              social_proof: setup.socialProof ?? undefined,
+            };
+          }
+
+          if (!state.chatSessionId && setup.chatSessionId) {
+            updates.chatSessionId = setup.chatSessionId;
+          }
+          if (!state.campaignId && setup.campaignId) {
+            updates.campaignId = setup.campaignId;
+          }
+          if (!state.isApproved && setup.isApproved) {
+            updates.isApproved = true;
+          }
+          if (state.dashboardView === "dag" && setup.dashboardView && setup.dashboardView !== "dag") {
+            updates.dashboardView = setup.dashboardView as DashboardView;
+          }
+
+          return Object.keys(updates).length > 0 ? updates : {};
+        }),
     }),
     {
       name: "sales-cold-emails-store",

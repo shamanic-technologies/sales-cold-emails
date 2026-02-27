@@ -143,3 +143,42 @@ export async function createCheckoutSession(
   }
   return res.json();
 }
+
+// --- Setup persistence ---
+
+export interface CampaignSetup {
+  brandUrl?: string | null;
+  objective?: string | null;
+  objectiveUrl?: string | null;
+  budgetType?: string | null;
+  budgetAmount?: number | string | null;
+  pricingTier?: string | null;
+  targetAudience?: string | null;
+  valueForTarget?: string | null;
+  urgency?: string | null;
+  scarcity?: string | null;
+  riskReversal?: string | null;
+  socialProof?: string | null;
+  chatSessionId?: string | null;
+  workflowId?: string | null;
+  workflowName?: string | null;
+  campaignId?: string | null;
+  isApproved?: boolean;
+  dashboardView?: string | null;
+}
+
+export async function getSetup(): Promise<CampaignSetup | null> {
+  const res = await fetch("/api/setup");
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export function saveSetup(data: CampaignSetup): void {
+  fetch("/api/setup", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  }).catch(() => {
+    // Fire-and-forget — never block UI
+  });
+}
