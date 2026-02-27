@@ -1,7 +1,5 @@
-const CHAT_SERVICE_URL = process.env.CHAT_SERVICE_URL;
-const CHAT_SERVICE_API_KEY = process.env.CHAT_SERVICE_API_KEY;
-const KEY_SERVICE_URL = process.env.KEY_SERVICE_URL;
-const KEY_SERVICE_API_KEY = process.env.KEY_SERVICE_API_KEY;
+const API_SERVICE_URL = process.env.API_SERVICE_URL;
+const MCPF_APP_KEY = process.env.MCPF_APP_KEY;
 const TRANSACTIONAL_EMAIL_SERVICE_URL = process.env.TRANSACTIONAL_EMAIL_SERVICE_URL;
 const TRANSACTIONAL_EMAIL_SERVICE_API_KEY = process.env.TRANSACTIONAL_EMAIL_SERVICE_API_KEY;
 
@@ -54,55 +52,53 @@ Follow this JSON block with a message like: "I have everything I need! The workf
 - Do not discuss pricing, your own capabilities, or anything outside campaign configuration
 `;
 
-// ── Chat config (lazy registration) ─────────────────────────────────────────
+// ── Chat config (lazy registration via api-service) ─────────────────────────
 
 let configRegistered = false;
 
-export async function ensureAppConfigRegistered(orgId: string, userId: string): Promise<void> {
+export async function ensureAppConfigRegistered(): Promise<void> {
   if (configRegistered) return;
-  if (!CHAT_SERVICE_URL || !CHAT_SERVICE_API_KEY) {
-    console.log("[instrumentation] CHAT_SERVICE_URL not set, skipping app config registration");
+  if (!API_SERVICE_URL || !MCPF_APP_KEY) {
+    console.log("[instrumentation] API_SERVICE not configured, skipping chat config registration");
     return;
   }
 
   try {
-    const res = await fetch(`${CHAT_SERVICE_URL}/apps/${APP_ID}/config`, {
+    const res = await fetch(`${API_SERVICE_URL}/v1/chat/config`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-API-Key": CHAT_SERVICE_API_KEY,
-        "x-org-id": orgId,
-        "x-user-id": userId,
+        "Authorization": `Bearer ${MCPF_APP_KEY}`,
       },
-      body: JSON.stringify({ systemPrompt: SYSTEM_PROMPT }),
+      body: JSON.stringify({ appId: APP_ID, systemPrompt: SYSTEM_PROMPT }),
     });
 
     if (!res.ok) {
-      console.error("[instrumentation] Failed to register app config:", res.status, await res.text());
+      console.error("[instrumentation] Failed to register chat config:", res.status, await res.text());
     } else {
       configRegistered = true;
-      console.log("[instrumentation] App config registered successfully");
+      console.log("[instrumentation] Chat config registered successfully");
     }
   } catch (err) {
-    console.error("[instrumentation] Error registering app config:", err);
+    console.error("[instrumentation] Error registering chat config:", err);
   }
 }
 
-// ── Key-service: register app secrets ────────────────────────────────────────
+// ── Provider keys: register via api-service ─────────────────────────────────
 
 async function registerAppKey(provider: string, apiKey: string): Promise<void> {
-  if (!KEY_SERVICE_URL || !KEY_SERVICE_API_KEY) {
-    console.warn(`[instrumentation] KEY_SERVICE not configured — skipping ${provider} registration`);
+  if (!API_SERVICE_URL || !MCPF_APP_KEY) {
+    console.warn(`[instrumentation] API_SERVICE not configured — skipping ${provider} key registration`);
     return;
   }
 
-  const res = await fetch(`${KEY_SERVICE_URL}/internal/app-keys`, {
+  const res = await fetch(`${API_SERVICE_URL}/v1/keys`, {
     method: "POST",
     headers: {
-      "x-api-key": KEY_SERVICE_API_KEY,
-      "content-type": "application/json",
+      "Authorization": `Bearer ${MCPF_APP_KEY}`,
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ appId: APP_ID, provider, apiKey }),
+    body: JSON.stringify({ provider, apiKey, scope: "app" }),
   });
 
   if (!res.ok) {
@@ -130,9 +126,9 @@ async function registerAppSecrets(): Promise<void> {
 
   if (registrations.length > 0) {
     await Promise.all(registrations);
-    console.log("[instrumentation] App secrets registered with key-service");
+    console.log("[instrumentation] App secrets registered via api-service");
   } else {
-    console.log("[instrumentation] No secrets found in env, skipping key-service registration");
+    console.log("[instrumentation] No secrets found in env, skipping key registration");
   }
 }
 
@@ -264,8 +260,8 @@ export async function register() {
     }
   }
 
-  if (CHAT_SERVICE_URL && CHAT_SERVICE_API_KEY) {
-    console.log("[instrumentation] Chat app config will be registered lazily on first chat request");
+  if (API_SERVICE_URL && MCPF_APP_KEY) {
+    console.log("[instrumentation] Chat config will be registered lazily on first chat request");
   }
 
   console.log("[instrumentation] Startup registrations complete");

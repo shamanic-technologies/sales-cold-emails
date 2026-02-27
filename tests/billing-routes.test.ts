@@ -5,60 +5,45 @@ import path from "path";
 const read = (p: string) =>
   fs.readFileSync(path.join(__dirname, p), "utf-8");
 
-describe("billing proxy", () => {
-  const src = read("../src/lib/billing-proxy.ts");
-
-  it("should check BILLING_SERVICE_URL for mock mode", () => {
-    expect(src).toContain("BILLING_SERVICE_URL");
-    expect(src).toContain("isBillingMockMode");
+describe("billing routes use unified api-proxy", () => {
+  it("should NOT have a separate billing-proxy module", () => {
+    const billingProxyPath = path.join(
+      __dirname,
+      "../src/lib/billing-proxy.ts"
+    );
+    expect(fs.existsSync(billingProxyPath)).toBe(false);
   });
 
-  it("should send x-api-key, x-org-id, x-app-id headers", () => {
-    expect(src).toContain('"x-api-key"');
-    expect(src).toContain('"x-org-id"');
-    expect(src).toContain('"x-app-id"');
-    expect(src).toContain("sales-cold-emails");
-  });
-
-  it("should NOT send x-user-id (billing is org-level)", () => {
-    expect(src).not.toContain("x-user-id");
-  });
-
-  it("should export ensureBillingAccount that calls GET /v1/accounts", () => {
-    expect(src).toContain("ensureBillingAccount");
-    expect(src).toContain("/v1/accounts");
-  });
-
-  it("should return 401 when orgId is missing", () => {
-    expect(src).toContain("401");
-    expect(src).toContain("Not provisioned");
-  });
-});
-
-describe("billing route handlers", () => {
-  it("balance route should have mock fallback and proxy to /v1/accounts/balance", () => {
+  it("balance route should use isMockMode and proxyToApi from api-proxy", () => {
     const src = read("../src/app/api/billing/balance/route.ts");
-    expect(src).toContain("isBillingMockMode");
+    expect(src).toContain("isMockMode");
+    expect(src).toContain("proxyToApi");
+    expect(src).toContain("@/lib/api-proxy");
     expect(src).toContain("balance_cents");
-    expect(src).toContain("/v1/accounts/balance");
+    expect(src).not.toContain("billing-proxy");
+    expect(src).not.toContain("ensureBillingAccount");
   });
 
-  it("balance route should ensure billing account exists before fetching balance", () => {
+  it("balance route should proxy to /v1/billing/accounts/balance", () => {
     const src = read("../src/app/api/billing/balance/route.ts");
-    expect(src).toContain("ensureBillingAccount");
+    expect(src).toContain("/v1/billing/accounts/balance");
   });
 
-  it("checkout route should proxy POST to /v1/checkout-sessions", () => {
+  it("checkout route should proxy POST to /v1/billing/checkout-sessions", () => {
     const src = read("../src/app/api/billing/checkout/route.ts");
     expect(src).toContain("POST");
-    expect(src).toContain("/v1/checkout-sessions");
-    expect(src).toContain("isBillingMockMode");
+    expect(src).toContain("/v1/billing/checkout-sessions");
+    expect(src).toContain("isMockMode");
+    expect(src).toContain("proxyToApi");
+    expect(src).not.toContain("billing-proxy");
   });
 
-  it("transactions route should have mock data and proxy to /v1/accounts/transactions", () => {
+  it("transactions route should use isMockMode and proxyToApi", () => {
     const src = read("../src/app/api/billing/transactions/route.ts");
-    expect(src).toContain("isBillingMockMode");
-    expect(src).toContain("/v1/accounts/transactions");
+    expect(src).toContain("isMockMode");
+    expect(src).toContain("proxyToApi");
+    expect(src).toContain("/v1/billing/accounts/transactions");
+    expect(src).not.toContain("billing-proxy");
   });
 
   it("transactions route should unwrap { transactions: [...] } and map snake_case fields", () => {

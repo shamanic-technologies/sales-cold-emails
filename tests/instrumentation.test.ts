@@ -11,13 +11,14 @@ describe("instrumentation", () => {
   describe("chat config", () => {
     it("should register app config lazily via ensureAppConfigRegistered", () => {
       expect(content).toContain("ensureAppConfigRegistered");
-      expect(content).toContain("/apps/${APP_ID}/config");
+      expect(content).toContain("/v1/chat/config");
       expect(content).toContain("systemPrompt");
     });
 
-    it("should send x-org-id and x-user-id headers for chat config", () => {
-      expect(content).toContain('"x-org-id": orgId');
-      expect(content).toContain('"x-user-id": userId');
+    it("should use Bearer auth with MCPF_APP_KEY for chat config", () => {
+      expect(content).toContain("Authorization");
+      expect(content).toContain("Bearer");
+      expect(content).toContain("MCPF_APP_KEY");
     });
 
     it("should cache registration with configRegistered flag", () => {
@@ -32,9 +33,9 @@ describe("instrumentation", () => {
     });
   });
 
-  describe("key-service secrets", () => {
-    it("should register Stripe secrets via POST /internal/app-keys", () => {
-      expect(content).toContain("/internal/app-keys");
+  describe("api-service key registration", () => {
+    it("should register secrets via POST /v1/keys on api-service", () => {
+      expect(content).toContain("/v1/keys");
       expect(content).toContain("registerAppKey");
       expect(content).toContain("registerAppSecrets");
     });
@@ -49,9 +50,15 @@ describe("instrumentation", () => {
       expect(content).toContain("process.env.STRIPE_SECRET_KEY");
     });
 
-    it("should use KEY_SERVICE_URL and KEY_SERVICE_API_KEY", () => {
-      expect(content).toContain("KEY_SERVICE_URL");
-      expect(content).toContain("KEY_SERVICE_API_KEY");
+    it("should use MCPF_APP_KEY for Bearer auth, not KEY_SERVICE", () => {
+      expect(content).toContain("MCPF_APP_KEY");
+      expect(content).toContain("Bearer");
+      expect(content).not.toContain("KEY_SERVICE_URL");
+      expect(content).not.toContain("KEY_SERVICE_API_KEY");
+    });
+
+    it("should send scope: app for key registration", () => {
+      expect(content).toContain('scope: "app"');
     });
 
     it("should send appId as sales-cold-emails", () => {
@@ -99,10 +106,6 @@ describe("instrumentation", () => {
 
     it("should skip non-nodejs runtime", () => {
       expect(content).toContain('NEXT_RUNTIME !== "nodejs"');
-    });
-
-    it("should not use Bearer auth", () => {
-      expect(content).not.toContain("Bearer");
     });
   });
 });

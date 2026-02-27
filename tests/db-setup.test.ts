@@ -87,7 +87,7 @@ describe("setup API route", () => {
   });
 
   it("should check org identity and return 401 when missing", () => {
-    expect(src).toContain("getOrgId");
+    expect(src).toContain("getClerkIds");
     expect(src).toContain("401");
   });
 

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { isBillingMockMode, proxyToBilling, ensureBillingAccount } from "@/lib/billing-proxy";
+import { isMockMode, proxyToApi } from "@/lib/api-proxy";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (isBillingMockMode()) {
+  if (isMockMode()) {
     return NextResponse.json({
       balance_cents: 200,
       billing_mode: "credits",
@@ -12,10 +12,7 @@ export async function GET() {
     });
   }
 
-  // Ensure billing account exists (auto-creates on first call)
-  await ensureBillingAccount();
-
-  const upstream = await proxyToBilling("/v1/accounts/balance");
+  const upstream = await proxyToApi("/v1/billing/accounts/balance");
   const data = await upstream.json();
   return NextResponse.json(data, { status: upstream.status });
 }

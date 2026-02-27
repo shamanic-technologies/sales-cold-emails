@@ -1,15 +1,8 @@
 import { NextRequest } from "next/server";
-import { getOrgId, getUserId } from "@/lib/api-proxy";
+import { isMockMode, proxyToApi } from "@/lib/api-proxy";
 import { ensureAppConfigRegistered } from "@/instrumentation";
 
-const CHAT_SERVICE_URL = process.env.CHAT_SERVICE_URL;
-const CHAT_SERVICE_API_KEY = process.env.CHAT_SERVICE_API_KEY;
-
 export const dynamic = "force-dynamic";
-
-function isChatMockMode(): boolean {
-  return !CHAT_SERVICE_URL;
-}
 
 const MOCK_QUESTIONS = [
   "Let's start with your **target audience**. Who are you trying to reach? What's their role, industry, and company size?",
@@ -24,7 +17,6 @@ function mockChatResponse(message: string, sessionId?: string) {
   const mockSessionId = sessionId ?? crypto.randomUUID();
   const encoder = new TextEncoder();
 
-  // Count exchanges to determine which mock reply to send
   const questionIndex = sessionId ? Math.min(MOCK_QUESTIONS.length - 1, 2) : 0;
   const isLaterExchange = !!sessionId;
 
@@ -74,37 +66,21 @@ export async function POST(req: NextRequest) {
     context?: Record<string, unknown>;
   };
 
-  if (isChatMockMode()) {
+  if (isMockMode()) {
     return mockChatResponse(message, sessionId);
   }
 
-  const orgId = await getOrgId();
-  const userId = await getUserId();
+  // Lazily register chat config on first request
+  await ensureAppConfigRegistered();
 
-  if (!orgId || !userId) {
-    return new Response(
-      JSON.stringify({ error: "Not provisioned. Missing org or user identity." }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  // Lazily register app config on first request (needs user's org/user context)
-  await ensureAppConfigRegistered(orgId, userId);
-
-  const upstream = await fetch(`${CHAT_SERVICE_URL}/chat`, {
+  const upstream = await proxyToApi("/v1/chat", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key": CHAT_SERVICE_API_KEY!,
-      "x-org-id": orgId,
-      "x-user-id": userId,
-    },
-    body: JSON.stringify({
+    body: {
       message,
       appId: "sales-cold-emails",
       sessionId,
       context,
-    }),
+    },
   });
 
   if (!upstream.ok || !upstream.body) {
