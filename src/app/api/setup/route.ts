@@ -67,7 +67,7 @@ export async function PUT(request: Request) {
       workflowName: body.workflowName ?? null,
       campaignId: body.campaignId ?? null,
       isApproved: body.isApproved ?? false,
-      dashboardView: body.dashboardView ?? "dag",
+      dashboardView: body.dashboardView ?? "workflow",
     })
     .onConflictDoUpdate({
       target: campaignSetups.orgId,
@@ -90,7 +90,7 @@ export async function PUT(request: Request) {
         workflowName: body.workflowName ?? null,
         campaignId: body.campaignId ?? null,
         isApproved: body.isApproved ?? false,
-        dashboardView: body.dashboardView ?? "dag",
+        dashboardView: body.dashboardView ?? "workflow",
         updatedAt: new Date(),
       },
     });
