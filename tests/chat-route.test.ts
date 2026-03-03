@@ -37,12 +37,12 @@ describe("chat route handler", () => {
     expect(content).toContain("ReadableStream");
   });
 
-  it("should send appId as sales-cold-emails", () => {
+  it("should not send appId (removed in breaking change)", () => {
     const content = fs.readFileSync(
       path.join(__dirname, "../src/app/api/chat/route.ts"),
       "utf-8"
     );
-    expect(content).toContain('"sales-cold-emails"');
+    expect(content).not.toContain("appId");
   });
 
   it("should lazily register app config with Clerk IDs", () => {

@@ -40,10 +40,10 @@ describe("instrumentation", () => {
   });
 
   describe("api-service key registration", () => {
-    it("should register secrets via POST /v1/keys on api-service", () => {
-      expect(content).toContain("/v1/keys");
-      expect(content).toContain("registerAppKey");
-      expect(content).toContain("registerAppSecrets");
+    it("should register platform keys via POST /v1/platform-keys on api-service", () => {
+      expect(content).toContain("/v1/platform-keys");
+      expect(content).toContain("registerPlatformKey");
+      expect(content).toContain("registerPlatformKeys");
     });
 
     it("should register gemini, stripe, and stripe-webhook providers", () => {
@@ -63,13 +63,10 @@ describe("instrumentation", () => {
       expect(content).not.toContain("KEY_SERVICE_API_KEY");
     });
 
-    it("should send scope: app for key registration", () => {
-      expect(content).toContain('scope: "app"');
-    });
-
-    it("should send appId as sales-cold-emails", () => {
-      expect(content).toContain('appId: APP_ID');
-      expect(content).toContain('"sales-cold-emails"');
+    it("should not use appId or scope: app (removed in breaking change)", () => {
+      expect(content).not.toContain("APP_ID");
+      expect(content).not.toContain('scope: "app"');
+      expect(content).not.toContain("appId");
     });
   });
 
@@ -105,8 +102,8 @@ describe("instrumentation", () => {
       expect(content).toContain("Promise.allSettled");
     });
 
-    it("should register secrets and templates in register()", () => {
-      expect(content).toContain("registerAppSecrets()");
+    it("should register platform keys and templates in register()", () => {
+      expect(content).toContain("registerPlatformKeys()");
       expect(content).toContain("registerEmailTemplates()");
     });
 

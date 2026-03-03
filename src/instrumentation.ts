@@ -3,8 +3,6 @@ const MCPF_APP_KEY = process.env.MCPF_APP_KEY;
 const TRANSACTIONAL_EMAIL_SERVICE_URL = process.env.TRANSACTIONAL_EMAIL_SERVICE_URL;
 const TRANSACTIONAL_EMAIL_SERVICE_API_KEY = process.env.TRANSACTIONAL_EMAIL_SERVICE_API_KEY;
 
-const APP_ID = "sales-cold-emails";
-
 // ── Chat service system prompt ──────────────────────────────────────────────
 
 const SYSTEM_PROMPT = `You are a cold email campaign assistant for Sales Cold Emails. You help users configure and launch personalized cold email campaigns.
@@ -74,7 +72,7 @@ export async function ensureAppConfigRegistered(clerkIds?: { orgId: string | nul
     const res = await fetch(`${API_SERVICE_URL}/v1/chat/config`, {
       method: "PUT",
       headers,
-      body: JSON.stringify({ appId: APP_ID, systemPrompt: SYSTEM_PROMPT }),
+      body: JSON.stringify({ systemPrompt: SYSTEM_PROMPT }),
     });
 
     if (!res.ok) {
@@ -88,21 +86,21 @@ export async function ensureAppConfigRegistered(clerkIds?: { orgId: string | nul
   }
 }
 
-// ── Provider keys: register via api-service ─────────────────────────────────
+// ── Provider keys: register as platform keys via api-service ────────────────
 
-async function registerAppKey(provider: string, apiKey: string): Promise<void> {
+async function registerPlatformKey(provider: string, apiKey: string): Promise<void> {
   if (!API_SERVICE_URL || !MCPF_APP_KEY) {
     console.warn(`[instrumentation] API_SERVICE not configured — skipping ${provider} key registration`);
     return;
   }
 
-  const res = await fetch(`${API_SERVICE_URL}/v1/keys`, {
+  const res = await fetch(`${API_SERVICE_URL}/v1/platform-keys`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${MCPF_APP_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ provider, apiKey, scope: "app" }),
+    body: JSON.stringify({ provider, apiKey }),
   });
 
   if (!res.ok) {
@@ -111,7 +109,7 @@ async function registerAppKey(provider: string, apiKey: string): Promise<void> {
   }
 }
 
-async function registerAppSecrets(): Promise<void> {
+async function registerPlatformKeys(): Promise<void> {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const geminiKey = process.env.GEMINI_API_KEY;
@@ -119,18 +117,18 @@ async function registerAppSecrets(): Promise<void> {
   const registrations: Promise<void>[] = [];
 
   if (geminiKey) {
-    registrations.push(registerAppKey("gemini", geminiKey));
+    registrations.push(registerPlatformKey("gemini", geminiKey));
   }
   if (stripeKey) {
-    registrations.push(registerAppKey("stripe", stripeKey));
+    registrations.push(registerPlatformKey("stripe", stripeKey));
   }
   if (webhookSecret) {
-    registrations.push(registerAppKey("stripe-webhook", webhookSecret));
+    registrations.push(registerPlatformKey("stripe-webhook", webhookSecret));
   }
 
   if (registrations.length > 0) {
     await Promise.all(registrations);
-    console.log("[instrumentation] App secrets registered via api-service");
+    console.log("[instrumentation] Platform keys registered via api-service");
   } else {
     console.log("[instrumentation] No secrets found in env, skipping key registration");
   }
@@ -235,7 +233,7 @@ Add credits: {{billingUrl}}`,
       "Content-Type": "application/json",
       "x-api-key": TRANSACTIONAL_EMAIL_SERVICE_API_KEY,
     },
-    body: JSON.stringify({ appId: APP_ID, templates }),
+    body: JSON.stringify({ templates }),
   });
 
   if (!res.ok) {
@@ -254,7 +252,7 @@ export async function register() {
   console.log("[instrumentation] Running startup registrations...");
 
   const results = await Promise.allSettled([
-    registerAppSecrets(),
+    registerPlatformKeys(),
     registerEmailTemplates(),
   ]);
 
