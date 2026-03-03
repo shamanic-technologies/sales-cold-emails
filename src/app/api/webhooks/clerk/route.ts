@@ -4,7 +4,6 @@ import { Webhook } from "svix";
 const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 const TRANSACTIONAL_EMAIL_SERVICE_URL = process.env.TRANSACTIONAL_EMAIL_SERVICE_URL;
 const TRANSACTIONAL_EMAIL_SERVICE_API_KEY = process.env.TRANSACTIONAL_EMAIL_SERVICE_API_KEY;
-const APP_ID = "sales-cold-emails";
 const DASHBOARD_URL = process.env.NEXT_PUBLIC_APP_URL
   ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
   : "https://salescoldemails.com/dashboard";
@@ -65,7 +64,6 @@ export async function POST(req: Request) {
             "x-api-key": TRANSACTIONAL_EMAIL_SERVICE_API_KEY,
           },
           body: JSON.stringify({
-            appId: APP_ID,
             eventType: "welcome",
             recipientEmail: email,
             metadata: {

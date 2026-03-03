@@ -78,7 +78,6 @@ export async function POST(req: NextRequest) {
     method: "POST",
     body: {
       message,
-      appId: "sales-cold-emails",
       sessionId,
       context,
     },
