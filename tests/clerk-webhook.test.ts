@@ -25,22 +25,33 @@ describe("Clerk webhook route", () => {
     expect(routeSrc).toContain('"user.created"');
   });
 
-  it("should send welcome email via transactional-email-service", () => {
-    expect(routeSrc).toContain("/send");
-    expect(routeSrc).toContain('"welcome"');
-    expect(routeSrc).toContain("eventType");
-    expect(routeSrc).toContain("recipientEmail");
+  it("should handle session.created event", () => {
+    expect(routeSrc).toContain('"session.created"');
   });
 
-  it("should pass firstName and dashboardUrl as metadata", () => {
+  it("should send welcome email via Postmark on signup", () => {
+    expect(routeSrc).toContain("api.postmarkapp.com/email");
+    expect(routeSrc).toContain("X-Postmark-Server-Token");
+    expect(routeSrc).toContain("POSTMARK_API_KEY");
+  });
+
+  it("should BCC admin on welcome email", () => {
+    expect(routeSrc).toContain("bcc: ADMIN_EMAIL");
+  });
+
+  it("should send signin notification to admin", () => {
+    expect(routeSrc).toContain("Sign-in:");
+    expect(routeSrc).toContain("ADMIN_EMAIL");
+  });
+
+  it("should look up user via clerkClient for session.created", () => {
+    expect(routeSrc).toContain("clerkClient");
+    expect(routeSrc).toContain("getUser(userId)");
+  });
+
+  it("should pass firstName and dashboardUrl in welcome email", () => {
     expect(routeSrc).toContain("firstName");
-    expect(routeSrc).toContain("dashboardUrl");
-    expect(routeSrc).toContain("metadata");
-  });
-
-  it("should use x-api-key auth for transactional-email-service", () => {
-    expect(routeSrc).toContain('"x-api-key"');
-    expect(routeSrc).toContain("TRANSACTIONAL_EMAIL_SERVICE_API_KEY");
+    expect(routeSrc).toContain("DASHBOARD_URL");
   });
 
   it("should return 400 for missing svix headers", () => {

@@ -70,41 +70,18 @@ describe("instrumentation", () => {
     });
   });
 
-  describe("transactional email templates", () => {
-    it("should register templates via PUT /templates", () => {
-      expect(content).toContain("registerEmailTemplates");
-      expect(content).toContain('method: "PUT"');
-      expect(content).toContain("/templates");
-    });
-
-    it("should use TRANSACTIONAL_EMAIL_SERVICE_URL and API_KEY", () => {
-      expect(content).toContain("TRANSACTIONAL_EMAIL_SERVICE_URL");
-      expect(content).toContain("TRANSACTIONAL_EMAIL_SERVICE_API_KEY");
-    });
-
-    it("should define welcome, campaign_launched, campaign_completed, and low_credits templates", () => {
-      expect(content).toContain('"welcome"');
-      expect(content).toContain('"campaign_launched"');
-      expect(content).toContain('"campaign_completed"');
-      expect(content).toContain('"low_credits"');
-    });
-
-    it("should include both htmlBody and textBody for each template", () => {
-      const htmlCount = (content.match(/htmlBody/g) || []).length;
-      const textCount = (content.match(/textBody/g) || []).length;
-      expect(htmlCount).toBeGreaterThanOrEqual(4);
-      expect(textCount).toBeGreaterThanOrEqual(4);
-    });
-  });
-
   describe("startup", () => {
     it("should use Promise.allSettled for parallel registration", () => {
       expect(content).toContain("Promise.allSettled");
     });
 
-    it("should register platform keys and templates in register()", () => {
+    it("should register platform keys in register()", () => {
       expect(content).toContain("registerPlatformKeys()");
-      expect(content).toContain("registerEmailTemplates()");
+    });
+
+    it("should not reference transactional-email-service (migrated to Postmark)", () => {
+      expect(content).not.toContain("TRANSACTIONAL_EMAIL_SERVICE");
+      expect(content).not.toContain("registerEmailTemplates");
     });
 
     it("should skip non-nodejs runtime", () => {
