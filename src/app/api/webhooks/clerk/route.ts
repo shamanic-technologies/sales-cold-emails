@@ -78,11 +78,14 @@ export async function POST(req: Request) {
   let event: ClerkUserEvent;
   try {
     const wh = new Webhook(CLERK_WEBHOOK_SECRET);
-    event = wh.verify(body, {
+    // svix v2: verify() throws on a bad signature and returns nothing,
+    // so the verified raw body is parsed here.
+    wh.verify(body, {
       "svix-id": svixId,
       "svix-timestamp": svixTimestamp,
       "svix-signature": svixSignature,
-    }) as ClerkUserEvent;
+    });
+    event = JSON.parse(body) as ClerkUserEvent;
   } catch (err) {
     console.error("[webhook/clerk] Signature verification failed:", err);
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });

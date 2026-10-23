@@ -1,18 +1,14 @@
 import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import tseslint from "typescript-eslint";
+import reactHooks from "eslint-plugin-react-hooks";
 
+// eslint-config-next was dropped: its @next/eslint-plugin-next pins fast-glob 3.3.1,
+// which pulls micromatch > braces (high advisory, no patched release).
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
+  ...tseslint.configs.recommended,
+  reactHooks.configs.flat["recommended-latest"],
+  { rules: { "@typescript-eslint/no-unused-vars": "warn" } },
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
 ]);
 
 export default eslintConfig;
